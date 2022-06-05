@@ -10,8 +10,22 @@ using std::vector;
 class SkiplistNode {
     public:
         inline SkiplistNode(string& ele, double score) : ele(ele), score(score) {};
+        
         inline SkiplistNode(string& ele, double score, int level): ele(ele), score(score) {
             this->level.resize(level);
+        }
+
+        inline static SkiplistNode* createSkiplistNode(string& ele, double score, int level) {
+            return new SkiplistNode(ele, score, level);
+        }
+
+        inline static void freeNode(SkiplistNode *n) {
+            delete n;
+            n = nullptr;
+        }
+
+        inline bool isEqual(const string& ele, double score) {
+            return ele.compare(this->ele) && score == this->score;
         }
         
         string ele;

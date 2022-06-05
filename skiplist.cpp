@@ -22,10 +22,6 @@ int Skiplist::getRandomLevel() {
     return level < MaxSkipListLevel ? level : MaxSkipListLevel;
 }
 
-SkiplistNode* Skiplist::createSkiplistNode(string& ele, double score) {
-    return new SkiplistNode(ele, score, this->level);
-}
-
 void Skiplist::insert(string& ele, double score) {
     SkiplistNode *x = this->header;
 
@@ -55,7 +51,7 @@ void Skiplist::insert(string& ele, double score) {
         this->level = level;
     }
 
-    x = this->createSkiplistNode(ele, score);
+    x = SkiplistNode::createSkiplistNode(ele, score, this->level);
 
     for(int i = level-1; i >= 0; --i) {
         x->level[i]->forward = update[i]->level[i]->forward;
@@ -78,4 +74,45 @@ void Skiplist::insert(string& ele, double score) {
     }
 
     ++this->length;
+}
+
+void Skiplist::del(SkiplistNode *n) {
+    vector<SkiplistNode*> update;
+    SkiplistNode *x = this->header;
+
+    for(int i = this->level-1; i >= 0; --i) {
+        while(x->level[i]->forward && (x->level[i]->forward->score < x->score 
+            || (x->level[i]->forward->score == x->score && x->level[i]->forward->ele.compare(n->ele) < 0))) {
+                x = x->level[i]->forward;
+            }
+        
+        update[i] = x;
+    }
+
+    this->deleteNode(n, update);
+    SkiplistNode::freeNode(n);
+}
+
+void Skiplist::deleteNode(SkiplistNode* x, vector<SkiplistNode*>& update) {
+    for(int i = this->level-1; i >= 0; --i) {
+        if(update[i]->level[i]->forward == x) {
+            update[i]->level[i]->forward = x->level[i]->forward;
+            update[i]->level[i]->span += (x->level[i]->span-1);
+        } else {
+            --update[i]->level[i]->span;
+        }
+    }
+
+    if(x->level[0]->forward) {
+        x->level[0]->forward->backward = x->backward;
+    } else {
+        this->tail = x->backward;
+    }
+    
+    for(int i = this->level-1; i >= 1 && !this->header->level[i]->forward; --i) {
+        --this->level;
+        this->header->level.pop_back();
+    }
+
+    --this->length;
 }
