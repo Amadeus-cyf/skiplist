@@ -9,13 +9,13 @@ using std::vector;
 
 class SkiplistNode {
     public:
-        inline SkiplistNode(string& ele, double score) : ele(ele), score(score) {};
+        inline SkiplistNode(const string& ele, double score) : ele(ele), score(score) {};
         
-        inline SkiplistNode(string& ele, double score, int level): ele(ele), score(score) {
+        inline SkiplistNode(const string& ele, double score, int level): ele(ele), score(score) {
             this->level.resize(level);
         }
 
-        inline static SkiplistNode* createSkiplistNode(string& ele, double score, int level) {
+        inline static SkiplistNode* createSkiplistNode(const string& ele, double score, int level) {
             return new SkiplistNode(ele, score, level);
         }
 

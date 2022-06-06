@@ -22,7 +22,7 @@ int Skiplist::getRandomLevel() {
     return level < MaxSkipListLevel ? level : MaxSkipListLevel;
 }
 
-void Skiplist::insert(string& ele, double score) {
+SkiplistNode* Skiplist::insert(const string& ele, double score) {
     SkiplistNode *x = this->header;
 
     vector<SkiplistNode*> update(this->level);
@@ -74,6 +74,7 @@ void Skiplist::insert(string& ele, double score) {
     }
 
     ++this->length;
+    return x;
 }
 
 void Skiplist::del(SkiplistNode *n) {
@@ -115,4 +116,57 @@ void Skiplist::deleteNode(SkiplistNode* x, vector<SkiplistNode*>& update) {
     }
 
     --this->length;
+}
+
+SkiplistNode* Skiplist::updateScore(const string& ele, double curscore, double newscore) {
+    vector<SkiplistNode*> update(this->level);
+    SkiplistNode *x = this->header;
+
+    for(int i = this->level-1; i >= 0; --i) {
+        while(x->level[i]->forward && (x->level[i]->forward->score < curscore 
+            || (x->level[i]->forward->score == curscore && x->level[i]->forward->ele.compare(ele) < 0))) {
+            x = x->level[i]->forward;
+        }
+
+        update[i] = x;
+    }
+
+    x = update[0]->level[0]->forward;
+
+    if(x->ele.compare(ele) != 0 || x->score != curscore) {
+        return nullptr;
+    }
+
+    if((!x->backward || x->backward->score <= curscore) 
+        && (!x->level[0]->forward || x->level[0]->forward->score >= curscore)) {
+        /* if new score is still at the same position, update score directly */
+        x->score = newscore;
+        return x;
+    }
+
+    this->deleteNode(x, update);
+    SkiplistNode::freeNode(x);
+
+    return this->insert(ele, newscore);
+}
+
+bool Skiplist::isInRange(RangeSpec *spec) {
+    SkiplistNode *x = this->tail;
+
+    double min = spec->getMin(), max = spec->getMax();
+    bool minex = spec->getMinex(), maxex = spec->getMaxex();
+
+    if(min > max || (min == max && (!minex || !maxex))) {
+        return false;
+    }
+
+    if(!this->tail && !spec->gteThanMin(this->tail->score)) {
+        return false;
+    }
+
+    if(!this->header && !spec->lteThanMax(this->header->score)) {
+        return false;
+    }
+
+    return true;
 }
