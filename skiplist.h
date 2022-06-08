@@ -5,7 +5,8 @@
 
 class Skiplist {
     public:
-        static const int MaxSkipListLevel = 1024;
+        static const double SkipListP;
+        static const int MaxSkipListLevel;
         Skiplist();
         int getRandomLevel();
         SkiplistNode* insert(const string& ele, double score);

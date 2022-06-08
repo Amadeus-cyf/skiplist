@@ -5,17 +5,18 @@
 using std::vector;
 using std::string;
 
+const double Skiplist::SkipListP = 1.0 / 2;
+const int Skiplist::MaxSkipListLevel = 16;
+
 Skiplist::Skiplist() : level(1), length(0) {
     string s = "";
     this->header = new SkiplistNode(s, 0, this->level);
 }
 
 int Skiplist::getRandomLevel() {
-    static const int threshold = MaxSkipListLevel * rand();
-
     int level = 1;
     
-    while(rand() < threshold) {
+    while(((double)rand() / RAND_MAX) < SkipListP && level < MaxSkipListLevel) {
         ++level;
     }
 
