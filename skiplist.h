@@ -9,8 +9,9 @@ class Skiplist {
         static const int MaxSkipListLevel;
         Skiplist();
         int getRandomLevel();
+        SkiplistNode* search(const string& ele, double score);
         SkiplistNode* insert(const string& ele, double score);
-        void del(SkiplistNode *x);
+        bool del(const string& ele, double score);
         void deleteNode(SkiplistNode* x, vector<SkiplistNode*>& update);
         SkiplistNode* updateScore(const string& ele, double curscore, double newscore);
         bool isInRange(RangeSpec *spec);

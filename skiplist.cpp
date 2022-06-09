@@ -23,6 +23,23 @@ int Skiplist::getRandomLevel() {
     return level < MaxSkipListLevel ? level : MaxSkipListLevel;
 }
 
+SkiplistNode* Skiplist::search(const string& ele, double score) {
+    SkiplistNode *x = this->header;
+
+    for(int i = this->level-1; i >= 0; --i) {
+        while(x->level[i]->forward && (x->level[i]->forward->score < score 
+        || (x->level[i]->forward->score == score && x->level[i]->forward->ele.compare(ele) < 0))) {
+            x = x->level[i]->forward;
+        }
+
+        if(x->score == score && x->ele.compare(ele) == 0) {
+            return x;
+        }
+    }
+
+    return nullptr;
+}
+
 SkiplistNode* Skiplist::insert(const string& ele, double score) {
     SkiplistNode *x = this->header;
 
@@ -33,9 +50,9 @@ SkiplistNode* Skiplist::insert(const string& ele, double score) {
         rank[i] == i == this->level-1 ? 0 : rank[i+1];
 
         while(x->level[i]->forward && (x->level[i]->forward->score < score 
-            || (x->level[i]->forward->score == score && x->level[i]->forward->ele.compare(ele) < 0))) {
-               rank[i] += x->level[i]->span;
-               x = x->level[i]->forward;
+        || (x->level[i]->forward->score == score && x->level[i]->forward->ele.compare(ele) < 0))) {
+            rank[i] += x->level[i]->span;
+            x = x->level[i]->forward;
         }
 
         update[i] = x;
@@ -78,21 +95,29 @@ SkiplistNode* Skiplist::insert(const string& ele, double score) {
     return x;
 }
 
-void Skiplist::del(SkiplistNode *n) {
+bool Skiplist::del(const string& ele, double score) {
     vector<SkiplistNode*> update;
     SkiplistNode *x = this->header;
 
     for(int i = this->level-1; i >= 0; --i) {
         while(x->level[i]->forward && (x->level[i]->forward->score < x->score 
-            || (x->level[i]->forward->score == x->score && x->level[i]->forward->ele.compare(n->ele) < 0))) {
-                x = x->level[i]->forward;
-            }
+        || (x->level[i]->forward->score == x->score && x->level[i]->forward->ele.compare(ele) < 0))) {
+            x = x->level[i]->forward;
+        }
         
         update[i] = x;
     }
 
-    this->deleteNode(n, update);
-    SkiplistNode::freeNode(n);
+    x = x->level[0]->forward;
+
+    if(x->score != score || x->ele.compare(ele) != 0) {
+        return false;
+    }
+
+    this->deleteNode(x, update);
+    SkiplistNode::freeNode(x);
+
+    return true;
 }
 
 void Skiplist::deleteNode(SkiplistNode* x, vector<SkiplistNode*>& update) {
@@ -125,7 +150,7 @@ SkiplistNode* Skiplist::updateScore(const string& ele, double curscore, double n
 
     for(int i = this->level-1; i >= 0; --i) {
         while(x->level[i]->forward && (x->level[i]->forward->score < curscore 
-            || (x->level[i]->forward->score == curscore && x->level[i]->forward->ele.compare(ele) < 0))) {
+        || (x->level[i]->forward->score == curscore && x->level[i]->forward->ele.compare(ele) < 0))) {
             x = x->level[i]->forward;
         }
 
@@ -161,11 +186,11 @@ bool Skiplist::isInRange(RangeSpec *spec) {
         return false;
     }
 
-    if(!this->tail && !spec->gteThanMin(this->tail->score)) {
+    if(!this->tail || !spec->gteThanMin(this->tail->score)) {
         return false;
     }
 
-    if(!this->header && !spec->lteThanMax(this->header->score)) {
+    if(!this->header || !spec->lteThanMax(this->header->score)) {
         return false;
     }
 
