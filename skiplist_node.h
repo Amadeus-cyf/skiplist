@@ -9,14 +9,14 @@ using std::vector;
 
 class SkiplistNode {
     public:
-        inline SkiplistNode(const string& ele, double score) : ele(ele), score(score) {};
-        
-        inline SkiplistNode(const string& ele, double score, int level): ele(ele), score(score) {
-            this->level.resize(level);
-        }
-
         inline static SkiplistNode* createSkiplistNode(const string& ele, double score, int level) {
-            return new SkiplistNode(ele, score, level);
+            SkiplistNode *n = new SkiplistNode(ele, score, level);
+
+            for(int i = 0; i < level; i++) {
+                n->level[i] = new SkiplistLevel(nullptr, 0);
+            }
+
+            return n;
         }
 
         inline static void freeNode(SkiplistNode *n) {
@@ -28,8 +28,23 @@ class SkiplistNode {
             return ele.compare(this->ele) && score == this->score;
         }
         
+        inline ~SkiplistNode() {
+            for(int i = 0; i < this->level.size(); ++i) {
+                if(this->level[i]) {
+                    delete this->level[i];
+                    this->level[i] = nullptr;
+                }
+            }
+        }
+
         string ele;
         double score;
         vector<SkiplistLevel*> level;
         SkiplistNode *backward;
+    private:
+        inline SkiplistNode(const string& ele, double score) : ele(ele), score(score), backward(nullptr) {};
+        
+        inline SkiplistNode(const string& ele, double score, int level): ele(ele), score(score), backward(nullptr) {
+            this->level.resize(level);
+        }
 };

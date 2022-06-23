@@ -8,9 +8,9 @@ using std::string;
 const double Skiplist::SkipListP = 1.0 / 2;
 const int Skiplist::MaxSkipListLevel = 16;
 
-Skiplist::Skiplist() : level(1), length(0) {
+Skiplist::Skiplist(int level) : level(level), length(0) {
     string s = "";
-    this->header = new SkiplistNode(s, 0, this->level);
+    this->header = SkiplistNode::createSkiplistNode("", 0, level);
 }
 
 int Skiplist::getRandomLevel() {
@@ -24,16 +24,19 @@ int Skiplist::getRandomLevel() {
 }
 
 SkiplistNode* Skiplist::search(const string& ele, double score) {
+    printf("search %s %f\n", ele.c_str(), score);
     SkiplistNode *x = this->header;
 
-    for(int i = this->level-1; i >= 0; --i) {
+    for(int i = this->level-1; i >= 0; --i) {    
         while(x->level[i]->forward && (x->level[i]->forward->score < score 
         || (x->level[i]->forward->score == score && x->level[i]->forward->ele.compare(ele) < 0))) {
             x = x->level[i]->forward;
         }
 
-        if(x->score == score && x->ele.compare(ele) == 0) {
-            return x;
+        SkiplistNode *f = x->level[i]->forward;
+
+        if(f && f->score == score && f->ele.compare(ele) == 0) {
+            return f;
         }
     }
 
@@ -41,16 +44,20 @@ SkiplistNode* Skiplist::search(const string& ele, double score) {
 }
 
 SkiplistNode* Skiplist::insert(const string& ele, double score) {
+    printf("%s %f\n", ele.c_str(), score);
+
     SkiplistNode *x = this->header;
 
     vector<SkiplistNode*> update(this->level);
     vector<int> rank(this->level);
 
+    printf("calculate rank\n");
+
     for(int i = this->level-1; i >= 0; --i) {
         rank[i] == i == this->level-1 ? 0 : rank[i+1];
 
-        while(x->level[i]->forward && (x->level[i]->forward->score < score 
-        || (x->level[i]->forward->score == score && x->level[i]->forward->ele.compare(ele) < 0))) {
+        while(x->level[i]->forward && (x->level[i]->forward->score < score
+            || (x->level[i]->forward->score == score && x->level[i]->forward->ele.compare(ele) < 0))) {
             rank[i] += x->level[i]->span;
             x = x->level[i]->forward;
         }
@@ -59,6 +66,8 @@ SkiplistNode* Skiplist::insert(const string& ele, double score) {
     }
 
     int level = getRandomLevel();
+
+    printf("get level %d\n", level);
 
     if(level > this->level) {
         for(int i = this->level; i < level; ++i) {
@@ -195,4 +204,18 @@ bool Skiplist::isInRange(RangeSpec *spec) {
     }
 
     return true;
+}
+
+Skiplist::~Skiplist() {
+    SkiplistNode* x = this->header;
+
+    while(x) {
+        printf("delete %s %f\n", x->ele.c_str(), x->score);
+        SkiplistNode* next = x->level[0]->forward;
+        x->level[0]->forward = nullptr;
+        x->backward = nullptr;
+
+        delete x;
+        x = next;
+    }
 }

@@ -7,4 +7,10 @@ class SkiplistLevel {
         inline SkiplistLevel(SkiplistNode *forward, long span) : forward(forward), span(span){};
         SkiplistNode *forward;
         long span; 
+
+        inline ~SkiplistLevel() {
+            if(this->forward) {
+                this->forward = nullptr;
+            }
+        }
 };
