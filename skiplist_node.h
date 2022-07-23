@@ -15,7 +15,7 @@ class SkiplistNode {
             for(int i = 0; i < level; i++) {
                 n->level[i] = new SkiplistLevel(nullptr, 0);
             }
-
+            
             return n;
         }
 

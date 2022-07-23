@@ -9,8 +9,7 @@ const double Skiplist::SkipListP = 1.0 / 2;
 const int Skiplist::MaxSkipListLevel = 16;
 
 Skiplist::Skiplist(int level) : level(level), length(0) {
-    string s = "";
-    this->header = SkiplistNode::createSkiplistNode("", 0, level);
+    this->header = SkiplistNode::createSkiplistNode("#", 0, level);
 }
 
 int Skiplist::getRandomLevel() {
@@ -105,12 +104,12 @@ SkiplistNode* Skiplist::insert(const string& ele, double score) {
 }
 
 bool Skiplist::del(const string& ele, double score) {
-    vector<SkiplistNode*> update;
+    vector<SkiplistNode*> update(this->level);
     SkiplistNode *x = this->header;
 
     for(int i = this->level-1; i >= 0; --i) {
         while(x->level[i]->forward && (x->level[i]->forward->score < x->score 
-        || (x->level[i]->forward->score == x->score && x->level[i]->forward->ele.compare(ele) < 0))) {
+            || (x->level[i]->forward->score == x->score && x->level[i]->forward->ele.compare(ele) < 0))) {
             x = x->level[i]->forward;
         }
         
@@ -124,7 +123,6 @@ bool Skiplist::del(const string& ele, double score) {
     }
 
     this->deleteNode(x, update);
-    SkiplistNode::freeNode(x);
 
     return true;
 }
@@ -149,6 +147,8 @@ void Skiplist::deleteNode(SkiplistNode* x, vector<SkiplistNode*>& update) {
         --this->level;
         this->header->level.pop_back();
     }
+
+    SkiplistNode::freeNode(x);
 
     --this->length;
 }
@@ -180,7 +180,6 @@ SkiplistNode* Skiplist::updateScore(const string& ele, double curscore, double n
     }
 
     this->deleteNode(x, update);
-    SkiplistNode::freeNode(x);
 
     return this->insert(ele, newscore);
 }

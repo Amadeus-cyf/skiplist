@@ -1,8 +1,17 @@
 #include "skiplist.h"
 
+void insert(Skiplist*);
+void del(Skiplist*);
+
 int main() {
     Skiplist* list = new Skiplist(4);
 
+    del(list);
+
+    delete list;
+}
+
+void insert(Skiplist* list) {
     list->insert("key1", 2);
     list->insert("key2", 3);
 
@@ -17,6 +26,22 @@ int main() {
     printf("%s %f\n", n2->ele.c_str(), n2->score);
 
     assert(n3 == nullptr);
+}
 
-    delete list;
+void del(Skiplist* list) {
+    insert(list);
+
+    SkiplistNode *n1 = list->search("key1", 2);
+
+    assert(n1);
+
+    assert(!list->del("key1", 3));
+
+    assert(list->del("key1", 2));
+
+    assert(!list->del("key1", 2));
+
+    n1 = list->search("key1", 2);
+
+    assert(n1 == nullptr);
 }
