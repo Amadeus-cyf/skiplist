@@ -45,6 +45,19 @@ SkiplistNode* Skiplist::search(const string& ele, double score) {
 SkiplistNode* Skiplist::insert(const string& ele, double score) {
     printf("%s %f\n", ele.c_str(), score);
 
+    int level = getRandomLevel();
+
+    printf("get level %d\n", level);
+
+    if(level > this->level) {
+        for(int i = this->level; i < level; ++i) {
+            SkiplistLevel *l = new SkiplistLevel(nullptr, this->length);
+            this->header->level.push_back(l);
+        }
+
+        this->level = level;
+    }
+
     SkiplistNode *x = this->header;
 
     vector<SkiplistNode*> update(this->level);
@@ -62,19 +75,6 @@ SkiplistNode* Skiplist::insert(const string& ele, double score) {
         }
 
         update[i] = x;
-    }
-
-    int level = getRandomLevel();
-
-    printf("get level %d\n", level);
-
-    if(level > this->level) {
-        for(int i = this->level; i < level; ++i) {
-            SkiplistLevel *l = new SkiplistLevel(nullptr, this->length);
-            this->header->level.push_back(l);
-        }
-
-        this->level = level;
     }
 
     x = SkiplistNode::createSkiplistNode(ele, score, this->level);
