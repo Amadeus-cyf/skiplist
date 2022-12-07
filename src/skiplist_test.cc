@@ -13,5 +13,11 @@ int main() {
   Skiplist<string, decltype(compare)> skiplist(4, compare);
   skiplist.insert("key1");
   skiplist.insert("key2");
-  assert(skiplist.size() == 2);
+  skiplist.insert("key0");
+  assert(skiplist.size() == 3);
+
+  assert(skiplist.contain("key1"));
+  assert(skiplist.contain("key2"));
+  assert(skiplist.contain("key0"));
+  assert(!skiplist.contain("key_not_exist"));
 }
