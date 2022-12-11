@@ -20,4 +20,18 @@ int main() {
   assert(skiplist.contain("key2"));
   assert(skiplist.contain("key0"));
   assert(!skiplist.contain("key_not_exist"));
+
+  assert(skiplist.del("key1"));
+  assert(!skiplist.contain("key1"));
+  assert(skiplist.size() == 2);
+  assert(!skiplist.del("key1"));
+  assert(skiplist.size() == 2);
+
+  assert(skiplist.del("key2"));
+  assert(!skiplist.contain("key2"));
+  assert(skiplist.size() == 1);
+  assert(!skiplist.del("key2"));
+  assert(skiplist.size() == 1);
+
+  assert(!skiplist.del("key_not_exist"));
 }
