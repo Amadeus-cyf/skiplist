@@ -4,18 +4,23 @@
 
 namespace skiplist {
 
-template <typename Key, typename Comparator>
+template <typename Key>
+const auto default_compare =
+    [](const Key& k1, const Key& k2) { return k1 < k2 ? -1 : (k1 == k2 ? 0 : 1); };
+
+template <typename Key, typename Comparator = decltype(default_compare<Key>)>
 class Skiplist {
  public:
   static constexpr const int MaxSkiplistLevel = 16;
   static constexpr const double SkiplistP = 0.5;
+  explicit Skiplist(int level);
   explicit Skiplist(int level, Comparator compare);
   void insert(const Key& key);
   bool contains(const Key& key);
   bool del(const Key& key);
   bool update(const Key& key, const Key& new_key);
   void reset();
-  int size() { return len; }
+  size_t size() { return len; }
   ~Skiplist();
 
  private:
@@ -29,9 +34,9 @@ class Skiplist {
   bool eq(const Key& k1, const Key& k2);
   bool deleteNode(const Key& key, SkiplistNode* prev[MaxSkiplistLevel]);
   SkiplistNode* head;
-  Comparator compare;
+  const Comparator compare;
   int level;
-  int len;
+  size_t len;
 };
 
 /* SkiplistLevel */
@@ -59,9 +64,7 @@ struct Skiplist<Key, Comparator>::SkiplistNode {
   void setSpan(int level, int span) { levels[level]->span = span; };
   const SkiplistNode* getPrev() const { return prev; };
   SkiplistNode* getPrev() { return prev; };
-  void setPrev(const SkiplistNode* prev_node) {
-    prev = const_cast<SkiplistNode*>(prev_node);
-  };
+  void setPrev(const SkiplistNode* prev_node) { prev = const_cast<SkiplistNode*>(prev_node); };
   void initLevel(int level) { levels[level] = new SkiplistLevel(nullptr, 0); };
   void reset();
   ~SkiplistNode();
@@ -78,8 +81,7 @@ struct Skiplist<Key, Comparator>::SkiplistNode {
 
 template <typename Key, typename Comparator>
 typename Skiplist<Key, Comparator>::SkiplistNode*
-Skiplist<Key, Comparator>::SkiplistNode::createSkiplistNode(const Key& key,
-                                                            int level) {
+Skiplist<Key, Comparator>::SkiplistNode::createSkiplistNode(const Key& key, int level) {
   SkiplistNode* n = new SkiplistNode(key);
   for (int i = 0; i < level; ++i) {
     n->levels[i] = new SkiplistLevel(nullptr, 0);
@@ -113,11 +115,15 @@ Skiplist<Key, Comparator>::SkiplistNode::~SkiplistNode() {
 
 /* Skiplist */
 template <typename Key, typename Comparator>
-Skiplist<Key, Comparator>::Skiplist(int level, Comparator compare)
+Skiplist<Key, Comparator>::Skiplist(int level)
     : level(level),
       head(SkiplistNode::createSkiplistNode(level)),
-      compare(compare),
+      compare(default_compare<Key>),
       len(0){};
+
+template <typename Key, typename Comparator>
+Skiplist<Key, Comparator>::Skiplist(int level, Comparator compare)
+    : level(level), head(SkiplistNode::createSkiplistNode(level)), compare(compare), len(0){};
 
 template <typename Key, typename Comparator>
 int Skiplist<Key, Comparator>::getRandomLevel() {
@@ -239,9 +245,7 @@ bool Skiplist<Key, Comparator>::del(const Key& key) {
     update[i] = n;
   }
 
-  bool r = deleteNode(key, update);
-
-  return r;
+  return deleteNode(key, update);
 }
 
 template <typename Key, typename Comparator>
@@ -264,9 +268,9 @@ bool Skiplist<Key, Comparator>::update(const Key& key, const Key& new_key) {
 
   /* getNext(0) must return a non null value since it's the node containing the
    * original key */
-  const SkiplistNode* next = update[0]->getNext(0)->getNext(0);
+  const SkiplistNode* next_next = update[0]->getNext(0)->getNext(0);
   if ((update[0] == head || gte(new_key, update[0]->key)) &&
-      (!next || lte(new_key, next->key))) {
+      (!next_next || lte(new_key, next_next->key))) {
     /* if in the key's position is not changed, update the key directly */
     SkiplistNode* next = update[0]->getNext(0);
     next->key = new_key;
@@ -280,18 +284,15 @@ bool Skiplist<Key, Comparator>::update(const Key& key, const Key& new_key) {
 }
 
 template <typename Key, typename Comparator>
-bool Skiplist<Key, Comparator>::deleteNode(
-    const Key& key, SkiplistNode* update[MaxSkiplistLevel]) {
+bool Skiplist<Key, Comparator>::deleteNode(const Key& key, SkiplistNode* update[MaxSkiplistLevel]) {
   bool deleted = false;
   SkiplistNode* node_to_delete = update[0]->getNext(0);
 
   for (int i = level - 1; i >= 0; --i) {
-    if (update[i] && update[i]->getNext(i) &&
-        eq(update[i]->getNext(i)->key, key)) {
+    if (update[i] && update[i]->getNext(i) && eq(update[i]->getNext(i)->key, key)) {
       SkiplistNode* next = update[i]->getNext(i);
       update[i]->setNext(i, next ? next->getNext(i) : nullptr);
-      update[i]->setSpan(
-          i, update[i]->getSpan(i) + (next ? next->getSpan(i) - 1 : 0));
+      update[i]->setSpan(i, update[i]->getSpan(i) + (next ? next->getSpan(i) - 1 : 0));
       deleted = true;
     }
   }
