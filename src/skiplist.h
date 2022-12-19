@@ -43,10 +43,17 @@ class Skiplist {
 template <typename Key, typename Comparator>
 struct Skiplist<Key, Comparator>::SkiplistLevel {
   explicit SkiplistLevel(SkiplistNode* next, int span) : next(next), span(0){};
-  ~SkiplistLevel() { next = nullptr; }
+  void reset();
+  ~SkiplistLevel() { reset(); }
   SkiplistNode* next;
   int span;
 };
+
+template <typename Key, typename Comparator>
+void Skiplist<Key, Comparator>::SkiplistLevel::reset() {
+  next = nullptr;
+  span = 0;
+}
 
 /* SkiplistNode */
 template <typename Key, typename Comparator>
@@ -315,7 +322,6 @@ void Skiplist<Key, Comparator>::reset() {
   SkiplistNode* node = head->getNext(0);
   while (node) {
     SkiplistNode* next = node->getNext(0);
-    node->setPrev(nullptr);
     delete node;
     node = next;
   }
