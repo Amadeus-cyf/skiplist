@@ -10,22 +10,40 @@ const auto default_compare =
 
 template <typename Key, typename Comparator = decltype(default_compare<Key>)>
 class Skiplist {
+ private:
+  struct SkiplistLevel;
+  struct SkiplistNode;
+
  public:
-  static constexpr const int MaxSkiplistLevel = 16;
-  static constexpr const double SkiplistP = 0.5;
+  class Iterator {
+   public:
+    Iterator(const Skiplist* skiplist);
+    Iterator(const Skiplist* skiplist, const SkiplistNode* node);
+    Iterator begin();
+    Iterator end();
+    void operator--();
+    void operator++();
+    const Key& operator*();
+
+   private:
+    const SkiplistNode* node;
+    const Skiplist* skiplist;
+  };
+  Skiplist();
   explicit Skiplist(int level);
   explicit Skiplist(int level, Comparator compare);
   void insert(const Key& key);
   bool contains(const Key& key);
   bool del(const Key& key);
   bool update(const Key& key, const Key& new_key);
-  void reset();
   size_t size() { return len; }
+  void clear();
   ~Skiplist();
 
  private:
-  struct SkiplistLevel;
-  struct SkiplistNode;
+  static constexpr const int InitSkiplistLevel = 2;
+  static constexpr const int MaxSkiplistLevel = 16;
+  static constexpr const double SkiplistP = 0.5;
   int getRandomLevel();
   bool lt(const Key& k1, const Key& k2);
   bool lte(const Key& k1, const Key& k2);
@@ -33,6 +51,8 @@ class Skiplist {
   bool gte(const Key& k1, const Key& k2);
   bool eq(const Key& k1, const Key& k2);
   bool deleteNode(const Key& key, SkiplistNode* prev[MaxSkiplistLevel]);
+  void reset();
+  const SkiplistNode* getLast() const;
   SkiplistNode* head;
   const Comparator compare;
   int level;
@@ -120,7 +140,48 @@ Skiplist<Key, Comparator>::SkiplistNode::~SkiplistNode() {
   reset();
 }
 
+/* Iterator */
+template <typename Key, typename Comparator>
+Skiplist<Key, Comparator>::Iterator::Iterator(const Skiplist* skiplist)
+    : skiplist(skiplist), node(nullptr){};
+
+template <typename Key, typename Comparator>
+Skiplist<Key, Comparator>::Iterator::Iterator(const Skiplist* skiplist, const SkiplistNode* node)
+    : skiplist(skiplist), node(node){};
+
+template <typename Key, typename Comparator>
+typename Skiplist<Key, Comparator>::Iterator Skiplist<Key, Comparator>::Iterator::begin() {
+  return Iterator(skiplist, skiplist->head->getNext(0));
+}
+
+template <typename Key, typename Comparator>
+typename Skiplist<Key, Comparator>::Iterator Skiplist<Key, Comparator>::Iterator::end() {
+  return Iterator(skiplist, skiplist->getLast());
+}
+
+template <typename Key, typename Comparator>
+void Skiplist<Key, Comparator>::Iterator::operator++() {
+  node = node->getNext(0);
+}
+
+template <typename Key, typename Comparator>
+void Skiplist<Key, Comparator>::Iterator::operator--() {
+  node = node->getPrev();
+}
+
+template <typename Key, typename Comparator>
+const Key& Skiplist<Key, Comparator>::Iterator::operator*() {
+  return node->key;
+}
+
 /* Skiplist */
+template <typename Key, typename Comparator>
+Skiplist<Key, Comparator>::Skiplist()
+    : level(InitSkiplistLevel),
+      head(SkiplistNode::createSkiplistNode(InitSkiplistLevel)),
+      compare(default_compare<Key>),
+      len(0){};
+
 template <typename Key, typename Comparator>
 Skiplist<Key, Comparator>::Skiplist(int level)
     : level(level),
@@ -273,7 +334,7 @@ bool Skiplist<Key, Comparator>::update(const Key& key, const Key& new_key) {
     return false;
   }
 
-  /* getNext(0) must return a non null value since it's the node containing the
+  /* the first getNext(0) must return a non null value since it's the node containing the
    * original key */
   const SkiplistNode* next_next = update[0]->getNext(0)->getNext(0);
   if ((update[0] == head || gte(new_key, update[0]->key)) &&
@@ -288,6 +349,12 @@ bool Skiplist<Key, Comparator>::update(const Key& key, const Key& new_key) {
   }
 
   return true;
+}
+
+template <typename Key, typename Comparator>
+void Skiplist<Key, Comparator>::clear() {
+  reset();
+  level = InitSkiplistLevel;
 }
 
 template <typename Key, typename Comparator>
@@ -315,6 +382,20 @@ bool Skiplist<Key, Comparator>::deleteNode(const Key& key, SkiplistNode* update[
   }
 
   return deleted;
+}
+
+template <typename Key, typename Comparator>
+const typename Skiplist<Key, Comparator>::SkiplistNode* Skiplist<Key, Comparator>::getLast() const {
+  const SkiplistNode* node = head;
+
+  int l = level;
+  while (--l >= 0) {
+    while (node->getNext(l)) {
+      node = node->getNext(l);
+    }
+  }
+
+  return const_cast<SkiplistNode*>(node);
 }
 
 template <typename Key, typename Comparator>

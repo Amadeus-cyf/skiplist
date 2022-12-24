@@ -5,6 +5,8 @@
 using skiplist::Skiplist;
 using std::string;
 
+void testIterator(const Skiplist<string>* skiplist);
+
 int main() {
   Skiplist<string> skiplist(4);
   skiplist.insert("key1");
@@ -48,4 +50,24 @@ int main() {
 
   assert(!skiplist.update("key_not_exist", "key6"));
   assert(skiplist.size() == 4);
+
+  testIterator(&skiplist);
+}
+
+void testIterator(const Skiplist<string>* skiplist) {
+ typename Skiplist<string>::Iterator it(skiplist);
+  it = it.end();
+  assert(*it == "key5");
+
+  --it;
+  assert(*it == "key4");
+
+  ++it;
+  assert(*it == "key5");
+
+  it = it.begin();
+  assert(*it == "key0");
+
+  ++it;
+  assert(*it == "key2");
 }

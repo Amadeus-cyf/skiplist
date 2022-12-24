@@ -2,7 +2,7 @@
 Implement redis' skiplist in C++. Refer to leveldb's skiplist and also [the essay](https://15721.courses.cs.cmu.edu/spring2018/papers/08-oltpindexes1/pugh-skiplists-cacm1990.pdf)
 
 ## Usage
-Init with default comparator. The type must support operator `<`, `>` and `==`
+Init with default comparator. The type must support operator `<`, `>` and `==`.
 ```C++
 #include "skiplist.h"
 
@@ -18,26 +18,26 @@ const auto compare =
 Skiplist<string, decltype(compare)> skiplist(4);
 ```
 
-Insert a key
+Insert a key.
 ```C++
 /* return true if success */
 skiplist.insert("key0");
 ```
 
-Check whether a key exists
+Check whether a key exists.
 ```C++
 if(skiplist.contains("key1")) {
   /* do something */
 }
 ```
 
-Delete a key
+Delete a key.
 ```C++
 /* return true if success */
 skiplist.del("key1");
 ```
 
-Update a key
+Update a key.
 ```C++
 /* return true if success */
 skiplist.update("key2", "key5");
