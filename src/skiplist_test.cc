@@ -14,6 +14,7 @@ void scanSkiplist(Skiplist<string>&);
 int main() {
   Skiplist<string> skiplist(4);
   testInsert(skiplist);
+  skiplist.print();
   testDel(skiplist);
 
   skiplist.insert("key1");
@@ -89,9 +90,11 @@ void testIterator(const Skiplist<string>* skiplist) {
 }
 
 void scanSkiplist(Skiplist<string>& skiplist) {
+  printf("----start scanning skiplist----\n");
   for (auto it = skiplist.begin(); it != skiplist.end(); ++it) {
     printf("%s\n", (*it).c_str());
   }
+  printf("----end----\n");
 
   skiplist.print();
 }

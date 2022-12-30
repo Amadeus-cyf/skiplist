@@ -106,7 +106,7 @@ struct Skiplist<Key, Comparator>::SkiplistNode {
   Key key;
 
  private:
-  SkiplistNode() : prev(nullptr){};
+  SkiplistNode() : prev(nullptr) { memset(levels, 0, sizeof levels); };
   explicit SkiplistNode(const Key& key) : key(key), prev(nullptr) {
     memset(levels, 0, sizeof levels);
   };
@@ -119,7 +119,7 @@ typename Skiplist<Key, Comparator>::SkiplistNode*
 Skiplist<Key, Comparator>::SkiplistNode::createSkiplistNode(const Key& key, int level) {
   SkiplistNode* n = new SkiplistNode(key);
   for (int i = 0; i < level; ++i) {
-    n->levels[i] = new SkiplistLevel(nullptr, 0);
+    n->initLevel(i);
   }
   return n;
 }
@@ -129,7 +129,7 @@ typename Skiplist<Key, Comparator>::SkiplistNode*
 Skiplist<Key, Comparator>::SkiplistNode::createSkiplistNode(int level) {
   SkiplistNode* n = new SkiplistNode();
   for (int i = 0; i < level; ++i) {
-    n->levels[i] = new SkiplistLevel(nullptr, 0);
+    n->initLevel(i);
   }
   return n;
 }
@@ -272,8 +272,19 @@ template <typename Key, typename Comparator>
 void Skiplist<Key, Comparator>::insert(const Key& key) {
   int insert_level = getRandomLevel();
 
-  const SkiplistNode* update[insert_level];
-  int rank[insert_level];
+  /*
+   * If random level is larger than level
+   * init empty skiplist level for extra levels and update level to the random
+   * level.
+   */
+  for (int i = level; i < insert_level; ++i) {
+    head->initLevel(i);
+  }
+
+  level = max(level, insert_level);
+
+  const SkiplistNode* update[level];
+  int rank[level];
 
   /*
    * get the last key less than current key in each level
@@ -289,30 +300,25 @@ void Skiplist<Key, Comparator>::insert(const Key& key) {
     update[i] = n;
   }
 
-  /*
-   * If random level is larger than level
-   * init empty skiplist level for extra levels and update level to the random
-   * level.
-   */
-  for (int i = level; i < insert_level; ++i) {
-    head->initLevel(i);
-    update[i] = head;
-  }
-
-  if (level < insert_level) level = insert_level;
-
   SkiplistNode* node = SkiplistNode::createSkiplistNode(key, level);
 
   /*
-   * insert the key into the skiplist in each level
+   * insert the key and update span
    */
-  for (int i = 0; i < insert_level; ++i) {
-    int span = update[i]->getSpan(i);
-    node->setNext(i, update[i]->getNext(i));
-    node->setSpan(i, span - rank[0] + rank[i]);
-    SkiplistNode* n = const_cast<SkiplistNode*>(update[i]);
-    n->setNext(i, node);
-    n->setSpan(i, rank[0] - rank[i] + 1);
+  for (int i = 0; i < level; ++i) {
+    if (i < insert_level) {
+      /* need to insert the key */
+      int span = update[i]->getSpan(i);
+      node->setNext(i, update[i]->getNext(i));
+      node->setSpan(i, span - rank[0] + rank[i]);
+      SkiplistNode* n = const_cast<SkiplistNode*>(update[i]);
+      n->setNext(i, node);
+      n->setSpan(i, rank[0] - rank[i] + 1);
+    } else {
+      /* only increase span by 1 */
+      SkiplistNode* n = const_cast<SkiplistNode*>(update[i]);
+      n->setSpan(i, update[i]->getSpan(i) + 1);
+    }
   }
 
   node->setPrev(update[0]);
@@ -412,14 +418,11 @@ void Skiplist<Key, Comparator>::print() {
   for (int i = level - 1; i >= 0; --i) {
     printf("h%d", i);
     while (node) {
-      if (node->getNext(i)) {
-        std::cout << node->key;
-        printf("---%d---", node->getSpan(i));
-      } else {
-        std::cout << node->key << std::endl;
-      }
+      std::cout << node->key;
+      printf("---%d---", node->getSpan(i));
       node = node->getNext(i);
     }
+    printf("end\n");
     node = head;
   }
 }

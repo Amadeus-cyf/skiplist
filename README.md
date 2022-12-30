@@ -42,3 +42,10 @@ Update a key.
 /* return true if success */
 skiplist.update("key2", "key5");
 ```
+
+Iterate over the skiplist.
+```C++
+for (auto it = skiplist.begin(); it != skiplist.end(); ++it) {
+  /* do something */
+}
+```
