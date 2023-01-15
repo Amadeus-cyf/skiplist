@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
 
 namespace skiplist {
 
@@ -20,7 +19,7 @@ class Skiplist {
    public:
     explicit Iterator(const Skiplist* skiplist);
     explicit Iterator(const Skiplist* skiplist, const SkiplistNode* node);
-    explicit Iterator(const Iterator& it);
+    Iterator(const Iterator& it);
     void seekToFirst();
     void seekToLast();
     Iterator& operator=(const Iterator& it);
@@ -39,7 +38,7 @@ class Skiplist {
   explicit Skiplist(int level, Comparator compare);
   Iterator begin();
   Iterator end();
-  void insert(const Key& key);
+  bool insert(const Key& key);
   bool contains(const Key& key);
   bool del(const Key& key);
   bool update(const Key& key, const Key& new_key);
@@ -269,7 +268,7 @@ bool Skiplist<Key, Comparator>::eq(const Key& k1, const Key& k2) {
 }
 
 template <typename Key, typename Comparator>
-void Skiplist<Key, Comparator>::insert(const Key& key) {
+bool Skiplist<Key, Comparator>::insert(const Key& key) {
   int insert_level = getRandomLevel();
 
   /*
@@ -281,7 +280,7 @@ void Skiplist<Key, Comparator>::insert(const Key& key) {
     head->initLevel(i);
   }
 
-  level = max(level, insert_level);
+  level = std::max(level, insert_level);
 
   const SkiplistNode* update[level];
   int rank[level];
@@ -292,11 +291,11 @@ void Skiplist<Key, Comparator>::insert(const Key& key) {
   const SkiplistNode* n = head;
   for (int i = level - 1; i >= 0; --i) {
     rank[i] = i == level - 1 ? 0 : rank[i + 1];
-    while (n->getNext(i) && lt(n->getNext(i)->key, key)) {
+    while (n->getNext(i) && lte(n->getNext(i)->key, key)) {
       rank[i] += n->getSpan(i);
       n = n->getNext(i);
     }
-    if (eq(n->key, key)) return;
+    if (eq(n->key, key)) return false;
     update[i] = n;
   }
 
@@ -328,6 +327,7 @@ void Skiplist<Key, Comparator>::insert(const Key& key) {
     node->getNext(0)->setPrev(node);
   }
   ++len;
+  return true;
 }
 
 template <typename Key, typename Comparator>
@@ -397,13 +397,12 @@ bool Skiplist<Key, Comparator>::update(const Key& key, const Key& new_key) {
     /* if in the key's position is not changed, update the key directly */
     SkiplistNode* next = update[0]->getNext(0);
     next->key = new_key;
+    return true;
   } else {
     /* otherwise, delete the original node and insert a new one */
     deleteNode(key, update);
-    insert(new_key);
+    return insert(new_key);
   }
-
-  return true;
 }
 
 template <typename Key, typename Comparator>
@@ -465,7 +464,7 @@ const typename Skiplist<Key, Comparator>::SkiplistNode* Skiplist<Key, Comparator
     }
   }
 
-  return const_cast<SkiplistNode*>(node);
+  return node;
 }
 
 template <typename Key, typename Comparator>
