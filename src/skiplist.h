@@ -239,7 +239,7 @@ int Skiplist<Key, Comparator>::getRandomLevel() {
   while (level < MaxSkiplistLevel && ((double)rand() / RAND_MAX) < SkiplistP) {
     ++level;
   }
-  return level < MaxSkiplistLevel ? level : MaxSkiplistLevel;
+  return level;
 }
 
 template <typename Key, typename Comparator>
