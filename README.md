@@ -62,7 +62,7 @@ for (auto it = skiplist.begin(); it != skiplist.end(); ++it) {
 cd build && ./skiplist_test
 ```
 
-## Format Code
+## Formatting Code
 ```sh
 clang-format -i --style=file src/skiplist.h && clang-format -i --style=file src/skiplist_test.cc
 ```

@@ -8,7 +8,7 @@ using std::string;
 
 namespace skiplist {
 
-void scanSkiplist(Skiplist<string>& skiplist);
+void scanSkiplist(const Skiplist<string>& skiplist);
 
 Skiplist<string> skiplist(4);
 
@@ -82,7 +82,7 @@ TEST(SkiplistTest, Iteration) {
   scanSkiplist(skiplist);
 }
 
-void scanSkiplist(Skiplist<string>& skiplist) {
+void scanSkiplist(const Skiplist<string>& skiplist) {
   printf("----start scanning skiplist----\n");
   for (auto it = skiplist.begin(); it != skiplist.end(); ++it) {
     printf("%s\n", (*it).c_str());

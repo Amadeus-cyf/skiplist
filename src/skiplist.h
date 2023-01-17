@@ -36,15 +36,15 @@ class Skiplist {
   Skiplist();
   explicit Skiplist(int level);
   explicit Skiplist(int level, Comparator compare);
-  Iterator begin();
-  Iterator end();
+  Iterator begin() const;
+  Iterator end() const;
   bool insert(const Key& key);
   bool contains(const Key& key);
   bool del(const Key& key);
   bool update(const Key& key, const Key& new_key);
   size_t size() { return len; }
   void clear();
-  void print();
+  void print() const;
   ~Skiplist();
 
  private:
@@ -224,12 +224,12 @@ Skiplist<Key, Comparator>::Skiplist(int level, Comparator compare)
     : level(level), head(SkiplistNode::createSkiplistNode(level)), compare(compare), len(0){};
 
 template <typename Key, typename Comparator>
-typename Skiplist<Key, Comparator>::Iterator Skiplist<Key, Comparator>::begin() {
+typename Skiplist<Key, Comparator>::Iterator Skiplist<Key, Comparator>::begin() const {
   return Iterator(this, head->getNext(0));
 }
 
 template <typename Key, typename Comparator>
-typename Skiplist<Key, Comparator>::Iterator Skiplist<Key, Comparator>::end() {
+typename Skiplist<Key, Comparator>::Iterator Skiplist<Key, Comparator>::end() const {
   return Iterator(this, findLast()->getNext(0));
 }
 
@@ -412,7 +412,7 @@ void Skiplist<Key, Comparator>::clear() {
 }
 
 template <typename Key, typename Comparator>
-void Skiplist<Key, Comparator>::print() {
+void Skiplist<Key, Comparator>::print() const {
   const SkiplistNode* node = head;
   for (int i = level - 1; i >= 0; --i) {
     printf("h%d", i);
