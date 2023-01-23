@@ -47,7 +47,7 @@ static void Search(benchmark::State& state) {
 
 static void Update(benchmark::State& state) {
   for (auto _ : state) {
-    int exist = rand() % 2;
+    bool exist = rand() % 2 == 1;
 
     if (exist) {
       /* update an existing key */
@@ -62,7 +62,7 @@ static void Update(benchmark::State& state) {
 
 static void Delete(benchmark::State& state) {
   for (auto _ : state) {
-    int exist = rand() % 2;
+    bool exist = rand() % 2 == 1;
 
     if (exist) {
       /* delete an existing key */
@@ -75,10 +75,17 @@ static void Delete(benchmark::State& state) {
   }
 }
 
+static void GetByRank(benchmark::State& state) {
+  for (auto _ : state) {
+    skiplist.getElementByRank(rand() % skiplist.size());
+  }
+}
+
 BENCHMARK(Insert);
 BENCHMARK(Search);
 BENCHMARK(Update);
 BENCHMARK(Delete);
+BENCHMARK(GetByRank);
 
 }  // namespace skiplist
 

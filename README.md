@@ -66,14 +66,14 @@ cd build && ./skiplist_test
 ### Setup
 Use a skiplist with initial depth = 16. All keys in the skiplist are random generated string with length = 10.
 ```
-2023-01-20T12:29:40+08:00
+2023-01-22T14:33:13+08:00
 Running ./skiplist_benchmark
-Run on (10 X 24.1211 MHz CPU s)
+Run on (10 X 24.0606 MHz CPU s)
 CPU Caches:
   L1 Data 64 KiB
   L1 Instruction 128 KiB
   L2 Unified 4096 KiB (x10)
-Load Average: 1.39, 1.53, 1.91
+Load Average: 2.93, 2.43, 2.20
 ```
 
 ### Running Benchmark
@@ -86,10 +86,11 @@ cd build && ./skiplist_benchmark
 -----------------------------------------------------
 Benchmark           Time             CPU   Iterations
 -----------------------------------------------------
-Insert           5529 ns         5529 ns       100000
-Search           4410 ns         4410 ns       153738
-Update           6859 ns         6859 ns        96664
-Delete           5275 ns         5275 ns       100000
+Insert           5592 ns         5591 ns       111527
+Search           4335 ns         4335 ns       161564
+Update           6804 ns         6804 ns        89739
+Delete           5091 ns         5091 ns       124217
+GetByRank         673 ns          673 ns       879176
 ```
 
 ## Formatting Code

@@ -25,6 +25,9 @@ target_link_libraries(
   GTest::gtest_main
 )
 
+include(GoogleTest)
+gtest_discover_tests(skiplist_test)
+
 add_subdirectory("third_party/benchmark")
 
 add_executable(skiplist_benchmark "")
@@ -37,6 +40,3 @@ target_link_libraries(
   skiplist_benchmark
   benchmark::benchmark
 )
-
-include(GoogleTest)
-gtest_discover_tests(skiplist_test)

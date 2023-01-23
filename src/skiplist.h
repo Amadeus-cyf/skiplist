@@ -42,6 +42,7 @@ class Skiplist {
   bool contains(const Key& key);
   bool del(const Key& key);
   bool update(const Key& key, const Key& new_key);
+  const Key& getElementByRank(int rank);
   size_t size() { return len; }
   void clear();
   void print() const;
@@ -58,6 +59,7 @@ class Skiplist {
   bool gte(const Key& k1, const Key& k2);
   bool eq(const Key& k1, const Key& k2);
   void deleteNode(const Key& key, SkiplistNode* prev[MaxSkiplistLevel]);
+  const Key& getElement(size_t rank);
   void reset();
   const SkiplistNode* findLast() const;
   SkiplistNode* head;
@@ -406,6 +408,11 @@ bool Skiplist<Key, Comparator>::update(const Key& key, const Key& new_key) {
 }
 
 template <typename Key, typename Comparator>
+const Key& Skiplist<Key, Comparator>::getElementByRank(int rank) {
+  return getElement(rank >= 0 ? rank : len + rank);
+}
+
+template <typename Key, typename Comparator>
 void Skiplist<Key, Comparator>::clear() {
   reset();
   level = InitSkiplistLevel;
@@ -450,6 +457,25 @@ void Skiplist<Key, Comparator>::deleteNode(const Key& key, SkiplistNode* update[
 
   delete node_to_delete;
   --len;
+}
+
+template <typename Key, typename Comparator>
+const Key& Skiplist<Key, Comparator>::getElement(size_t idx) {
+  int rank = -1;
+  const SkiplistNode* node = head;
+
+  for (int i = level - 1; i >= 0; --i) {
+    while (node->getNext(i) && (rank + node->getSpan(i) < idx)) {
+      rank += node->getSpan(i);
+      node = node->getNext(i);
+    }
+
+    if (node->getNext(i) && rank + node->getSpan(i) == idx) {
+      return node->getNext(i)->key;
+    }
+  }
+
+  throw std::out_of_range("rank out of bound");
 }
 
 template <typename Key, typename Comparator>
