@@ -75,9 +75,27 @@ static void Delete(benchmark::State& state) {
   }
 }
 
-static void GetByRank(benchmark::State& state) {
+static void GetElementByRank(benchmark::State& state) {
   for (auto _ : state) {
     skiplist.getElementByRank(rand() % skiplist.size());
+  }
+}
+
+static void GetRankOfElement(benchmark::State& state) {
+  for (auto _ : state) {
+    bool exist = rand() % 2 == 1;
+
+    if (exist) {
+      skiplist.getRankofElement(keys[rand() % keys.size()]);
+    } else {
+      skiplist.getRankofElement(randString(10));
+    }
+  }
+}
+
+static void GetElementsByRange(benchmark::State& state) {
+  for (auto _ : state) {
+    skiplist.getElementsByRange(rand() % keys.size(), rand() % (keys.size() + 1));
   }
 }
 
@@ -85,7 +103,9 @@ BENCHMARK(Insert);
 BENCHMARK(Search);
 BENCHMARK(Update);
 BENCHMARK(Delete);
-BENCHMARK(GetByRank);
+BENCHMARK(GetElementByRank);
+BENCHMARK(GetRankOfElement);
+BENCHMARK(GetElementsByRange);
 
 }  // namespace skiplist
 

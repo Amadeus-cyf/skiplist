@@ -4,13 +4,11 @@
 
 #include <string>
 
-using std::string;
-
 namespace skiplist {
 
-void scanSkiplist(const Skiplist<string>& skiplist);
+void scanSkiplist(const Skiplist<std::string>& skiplist);
 
-Skiplist<string> skiplist(4);
+Skiplist<std::string> skiplist(4);
 
 TEST(SkiplistTest, Insertion) {
   ASSERT_TRUE(skiplist.insert("key1"));
@@ -63,19 +61,19 @@ TEST(SkiplistTest, Update) {
 }
 
 TEST(SkiplistTest, GetElementByRank) {
-  const string& s0 = skiplist.getElementByRank(0);
+  const std::string& s0 = skiplist.getElementByRank(0);
   ASSERT_EQ(s0, "key0");
 
-  const string& s1 = skiplist.getElementByRank(1);
+  const std::string& s1 = skiplist.getElementByRank(1);
   ASSERT_EQ(s1, "key2");
 
-  const string& s2 = skiplist.getElementByRank(-1);
+  const std::string& s2 = skiplist.getElementByRank(-1);
   ASSERT_EQ(s2, "key5");
 
-  const string& s3 = skiplist.getElementByRank(-2);
+  const std::string& s3 = skiplist.getElementByRank(-2);
   ASSERT_EQ(s3, "key4");
 
-  const string& s4 = skiplist.getElementByRank(-4);
+  const std::string& s4 = skiplist.getElementByRank(-4);
   ASSERT_EQ(s4, "key0");
 
   ASSERT_THROW(skiplist.getElementByRank(skiplist.size()), std::out_of_range);
@@ -84,8 +82,54 @@ TEST(SkiplistTest, GetElementByRank) {
   ASSERT_THROW(skiplist.getElementByRank(INT_MIN), std::out_of_range);
 }
 
+TEST(SkiplistTest, GetRankofElement) {
+  ssize_t r0 = skiplist.getRankofElement("key0");
+  ASSERT_EQ(r0, 0);
+
+  ssize_t r1 = skiplist.getRankofElement("key2");
+  ASSERT_EQ(r1, 1);
+
+  ssize_t r2 = skiplist.getRankofElement("key5");
+  ASSERT_EQ(r2, 3);
+
+  ssize_t r3 = skiplist.getRankofElement("key_not_exist");
+  ASSERT_EQ(r3, -1);
+}
+
+TEST(SkiplistTest, getElementsByRange) {
+  const std::vector<std::string>& k1 = skiplist.getElementsByRange(0, 4);
+  ASSERT_EQ(k1.size(), 4);
+  ASSERT_EQ(k1[0], "key0");
+  ASSERT_EQ(k1[3], "key5");
+
+  const std::vector<std::string>& k2 = skiplist.getElementsByRange(1, 1);
+  ASSERT_EQ(k2.size(), 1);
+  ASSERT_EQ(k2[0], "key2");
+
+  const std::vector<std::string>& k3 = skiplist.getElementsByRange(3, 0);
+  ASSERT_EQ(k3.size(), 0);
+
+  const std::vector<std::string>& k4 = skiplist.getElementsByRange(3, INT_MAX);
+  ASSERT_EQ(k4.size(), 1);
+  ASSERT_EQ(k4[0], "key5");
+
+  const std::vector<std::string>& k5 = skiplist.getElementsByRange(-1, 1);
+  ASSERT_EQ(k5.size(), 1);
+  ASSERT_EQ(k5[0], "key5");
+
+  const std::vector<std::string>& k6 = skiplist.getElementsByRange(-2, 2);
+  ASSERT_EQ(k6.size(), 2);
+  ASSERT_EQ(k6[0], "key4");
+  ASSERT_EQ(k6[1], "key5");
+
+  const std::vector<std::string>& k7 = skiplist.getElementsByRange(-2, INT_MAX);
+  ASSERT_EQ(k7.size(), 2);
+  ASSERT_EQ(k7[0], "key4");
+  ASSERT_EQ(k7[1], "key5");
+}
+
 TEST(SkiplistTest, Iteration) {
-  typename Skiplist<string>::Iterator it(&skiplist);
+  typename Skiplist<std::string>::Iterator it(&skiplist);
   it.seekToLast();
   ASSERT_EQ(*it, "key5");
 
@@ -104,7 +148,7 @@ TEST(SkiplistTest, Iteration) {
   scanSkiplist(skiplist);
 }
 
-void scanSkiplist(const Skiplist<string>& skiplist) {
+void scanSkiplist(const Skiplist<std::string>& skiplist) {
   printf("----start scanning skiplist----\n");
   for (auto it = skiplist.begin(); it != skiplist.end(); ++it) {
     printf("%s\n", (*it).c_str());

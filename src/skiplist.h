@@ -43,7 +43,9 @@ class Skiplist {
   bool del(const Key& key);
   bool update(const Key& key, const Key& new_key);
   const Key& getElementByRank(int rank);
-  size_t size() { return len; }
+  ssize_t getRankofElement(const Key& key);
+  const std::vector<Key> getElementsByRange(int rank, size_t len);
+  size_t size() { return _size; }
   void clear();
   void print() const;
   ~Skiplist();
@@ -52,30 +54,31 @@ class Skiplist {
   static constexpr const int InitSkiplistLevel = 2;
   static constexpr const int MaxSkiplistLevel = 16;
   static constexpr const double SkiplistP = 0.5;
-  int getRandomLevel();
+  int randomLevel();
   bool lt(const Key& k1, const Key& k2);
   bool lte(const Key& k1, const Key& k2);
   bool gt(const Key& k1, const Key& k2);
   bool gte(const Key& k1, const Key& k2);
   bool eq(const Key& k1, const Key& k2);
   void deleteNode(const Key& key, SkiplistNode* prev[MaxSkiplistLevel]);
-  const Key& getElement(size_t rank);
+  const SkiplistNode* getElement(size_t rank);
+  const std::vector<Key> getElements(size_t rank, size_t len);
   void reset();
   const SkiplistNode* findLast() const;
   SkiplistNode* head;
   const Comparator compare;
   int level;
-  size_t len;
+  size_t _size;
 };
 
 /* SkiplistLevel */
 template <typename Key, typename Comparator>
 struct Skiplist<Key, Comparator>::SkiplistLevel {
-  explicit SkiplistLevel(SkiplistNode* next, int span) : next(next), span(0){};
+  explicit SkiplistLevel(SkiplistNode* next, size_t span) : next(next), span(0){};
   void reset();
   ~SkiplistLevel() { reset(); }
   SkiplistNode* next;
-  int span;
+  size_t span;
 };
 
 template <typename Key, typename Comparator>
@@ -95,9 +98,9 @@ struct Skiplist<Key, Comparator>::SkiplistNode {
   void setNext(int level, const SkiplistNode* next) {
     levels[level]->next = const_cast<SkiplistNode*>(next);
   };
-  int getSpan(int level) const { return levels[level]->span; };
-  int getSpan(int level) { return levels[level]->span; };
-  void setSpan(int level, int span) { levels[level]->span = span; };
+  size_t getSpan(int level) const { return levels[level]->span; };
+  size_t getSpan(int level) { return levels[level]->span; };
+  void setSpan(int level, size_t span) { levels[level]->span = span; };
   const SkiplistNode* getPrev() const { return prev; };
   SkiplistNode* getPrev() { return prev; };
   void setPrev(const SkiplistNode* prev_node) { prev = const_cast<SkiplistNode*>(prev_node); };
@@ -212,18 +215,18 @@ Skiplist<Key, Comparator>::Skiplist()
     : level(InitSkiplistLevel),
       head(SkiplistNode::createSkiplistNode(InitSkiplistLevel)),
       compare(default_compare<Key>),
-      len(0){};
+      _size(0){};
 
 template <typename Key, typename Comparator>
 Skiplist<Key, Comparator>::Skiplist(int level)
     : level(level),
       head(SkiplistNode::createSkiplistNode(level)),
       compare(default_compare<Key>),
-      len(0){};
+      _size(0){};
 
 template <typename Key, typename Comparator>
 Skiplist<Key, Comparator>::Skiplist(int level, Comparator compare)
-    : level(level), head(SkiplistNode::createSkiplistNode(level)), compare(compare), len(0){};
+    : level(level), head(SkiplistNode::createSkiplistNode(level)), compare(compare), _size(0){};
 
 template <typename Key, typename Comparator>
 typename Skiplist<Key, Comparator>::Iterator Skiplist<Key, Comparator>::begin() const {
@@ -236,7 +239,7 @@ typename Skiplist<Key, Comparator>::Iterator Skiplist<Key, Comparator>::end() co
 }
 
 template <typename Key, typename Comparator>
-int Skiplist<Key, Comparator>::getRandomLevel() {
+int Skiplist<Key, Comparator>::randomLevel() {
   int level = 1;
   while (level < MaxSkiplistLevel && ((double)rand() / RAND_MAX) < SkiplistP) {
     ++level;
@@ -271,7 +274,7 @@ bool Skiplist<Key, Comparator>::eq(const Key& k1, const Key& k2) {
 
 template <typename Key, typename Comparator>
 bool Skiplist<Key, Comparator>::insert(const Key& key) {
-  int insert_level = getRandomLevel();
+  int insert_level = randomLevel();
 
   /*
    * If random level is larger than level
@@ -285,7 +288,7 @@ bool Skiplist<Key, Comparator>::insert(const Key& key) {
   level = std::max(level, insert_level);
 
   const SkiplistNode* update[level];
-  int rank[level];
+  size_t rank[level];
 
   /*
    * get the last key less than current key in each level
@@ -309,7 +312,7 @@ bool Skiplist<Key, Comparator>::insert(const Key& key) {
   for (int i = 0; i < level; ++i) {
     if (i < insert_level) {
       /* need to insert the key */
-      int span = update[i]->getSpan(i);
+      size_t span = update[i]->getSpan(i);
       node->setNext(i, update[i]->getNext(i));
       node->setSpan(i, span - rank[0] + rank[i]);
       SkiplistNode* n = const_cast<SkiplistNode*>(update[i]);
@@ -328,7 +331,7 @@ bool Skiplist<Key, Comparator>::insert(const Key& key) {
   if (node->getNext(0)) {
     node->getNext(0)->setPrev(node);
   }
-  ++len;
+  ++_size;
   return true;
 }
 
@@ -409,7 +412,39 @@ bool Skiplist<Key, Comparator>::update(const Key& key, const Key& new_key) {
 
 template <typename Key, typename Comparator>
 const Key& Skiplist<Key, Comparator>::getElementByRank(int rank) {
-  return getElement(rank >= 0 ? rank : len + rank);
+  const SkiplistNode* node = getElement(rank >= 0 ? rank : rank + _size);
+
+  if (!node) throw std::out_of_range("index out of bound");
+
+  return node->key;
+}
+
+template <typename Key, typename Comparator>
+ssize_t Skiplist<Key, Comparator>::getRankofElement(const Key& key) {
+  size_t rank = 0;
+  const SkiplistNode* node = head;
+
+  for (int i = level - 1; i >= 0; --i) {
+    while (node->getNext(i) && lt(node->getNext(i)->key, key)) {
+      rank += node->getSpan(i);
+      node = node->getNext(i);
+    }
+
+    if (node->getNext(i) && eq(node->getNext(i)->key, key)) {
+      return rank + node->getSpan(i) - 1;
+    }
+  }
+
+  return -1;
+}
+
+template <typename Key, typename Comparator>
+const std::vector<Key> Skiplist<Key, Comparator>::getElementsByRange(int idx, size_t len) {
+  if (idx < 0) {
+    idx += _size;
+  }
+
+  return getElements(idx, len);
 }
 
 template <typename Key, typename Comparator>
@@ -425,7 +460,7 @@ void Skiplist<Key, Comparator>::print() const {
     printf("h%d", i);
     while (node) {
       std::cout << node->key;
-      printf("---%d---", node->getSpan(i));
+      printf("---%zu---", node->getSpan(i));
       node = node->getNext(i);
     }
     printf("end\n");
@@ -456,11 +491,12 @@ void Skiplist<Key, Comparator>::deleteNode(const Key& key, SkiplistNode* update[
   }
 
   delete node_to_delete;
-  --len;
+  --_size;
 }
 
 template <typename Key, typename Comparator>
-const Key& Skiplist<Key, Comparator>::getElement(size_t idx) {
+const typename Skiplist<Key, Comparator>::SkiplistNode* Skiplist<Key, Comparator>::getElement(
+    size_t idx) {
   int rank = -1;
   const SkiplistNode* node = head;
 
@@ -471,11 +507,27 @@ const Key& Skiplist<Key, Comparator>::getElement(size_t idx) {
     }
 
     if (node->getNext(i) && rank + node->getSpan(i) == idx) {
-      return node->getNext(i)->key;
+      return node->getNext(i);
     }
   }
 
-  throw std::out_of_range("rank out of bound");
+  return nullptr;
+}
+
+template <typename Key, typename Comparator>
+const std::vector<Key> Skiplist<Key, Comparator>::getElements(size_t rank, size_t len) {
+  if (len == 0) return {};
+
+  const SkiplistNode* node = getElement(rank);
+  if (node == nullptr) return {};
+
+  std::vector<Key> keys;
+  size_t i = 0;
+  while (node && keys.size() < len) {
+    keys.push_back(node->key);
+    node = node->getNext(0);
+  }
+  return keys;
 }
 
 template <typename Key, typename Comparator>
@@ -503,7 +555,7 @@ void Skiplist<Key, Comparator>::reset() {
   }
 
   head->reset();
-  len = 0;
+  _size = 0;
 }
 
 template <typename Key, typename Comparator>

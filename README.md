@@ -38,6 +38,28 @@ if(skiplist.contains("key1")) {
 }
 ```
 
+Get a key by rank
+```C++
+/* get first element */
+const string& first_key = skiplist.getElementByRank(0);
+/* get last element */
+const string& last_key = skiplist.getElementByRank(-1);
+```
+
+Get rank of a key
+```C++
+/* get a key by rank (0-index based) */
+const size_t rank = skiplist.getRankofElement("key");
+```
+
+Get keys by range
+```C++
+/* get 4 keys starting at the key of index 0 */
+const std::vector<string>& keys = skiplist.getElementsByRange(0, 4);
+/* get 2 keys starting at the second last key */
+const std::vector<string>& last_keys = skiplist.getElements(-2, 2);
+```
+
 Delete a key.
 ```C++
 /* return true if success */
@@ -66,14 +88,14 @@ cd build && ./skiplist_test
 ### Setup
 Use a skiplist with initial depth = 16. All keys in the skiplist are random generated string with length = 10.
 ```
-2023-01-22T14:33:13+08:00
+2023-01-29T14:47:42+08:00
 Running ./skiplist_benchmark
-Run on (10 X 24.0606 MHz CPU s)
+Run on (10 X 24.1214 MHz CPU s)
 CPU Caches:
   L1 Data 64 KiB
   L1 Instruction 128 KiB
   L2 Unified 4096 KiB (x10)
-Load Average: 2.93, 2.43, 2.20
+Load Average: 1.35, 1.86, 1.87
 ```
 
 ### Running Benchmark
@@ -83,14 +105,16 @@ cd build && ./skiplist_benchmark
 
 ### Performance
 ```
------------------------------------------------------
-Benchmark           Time             CPU   Iterations
------------------------------------------------------
-Insert           5592 ns         5591 ns       111527
-Search           4335 ns         4335 ns       161564
-Update           6804 ns         6804 ns        89739
-Delete           5091 ns         5091 ns       124217
-GetByRank         673 ns          673 ns       879176
+-------------------------------------------------------------
+Benchmark                   Time             CPU   Iterations
+-------------------------------------------------------------
+Insert                   5868 ns         5842 ns       122100
+Search                   4099 ns         4099 ns       154396
+Update                   6621 ns         6621 ns        91885
+Delete                   4718 ns         4718 ns       137806
+GetElementByRank          579 ns          579 ns      1149350
+GetRankOfElement         3999 ns         3999 ns       173237
+GetElementsByRange    3521490 ns      3521495 ns          184
 ```
 
 ## Formatting Code
