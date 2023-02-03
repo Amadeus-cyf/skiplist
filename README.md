@@ -2,7 +2,6 @@
 Implement redis' skiplist in C++. Refer to leveldb's skiplist and [the Essay of William Pugh](https://15721.courses.cs.cmu.edu/spring2018/papers/08-oltpindexes1/pugh-skiplists-cacm1990.pdf).
 
 ## Building
-For macos,
 ```sh
 mkdir build && cd build
 cmake .. && cmake --build .
@@ -48,7 +47,7 @@ const string& last_key = skiplist.getElementByRank(-1);
 
 Get rank of a key
 ```C++
-/* get a key by rank (0-index based) */
+/* get the rank(0-index based) of a key */
 const size_t rank = skiplist.getRankofElement("key");
 ```
 
@@ -57,7 +56,15 @@ Get keys by range
 /* get 4 keys starting at the key of index 0 */
 const std::vector<string>& keys = skiplist.getElementsByRange(0, 4);
 /* get 2 keys starting at the second last key */
-const std::vector<string>& last_keys = skiplist.getElements(-2, 2);
+const std::vector<string>& last_keys = skiplist.getElementsByRange(-2, 2);
+```
+
+Get keys by reverse range
+```C++
+/* get 4 keys reversely starting at the key of index 0 */
+const std::vector<string>& keys = skiplist.getElementsByRevRange(0, 4);
+/* get 2 keys reversely starting at the second last key */
+const std::vector<string>& last_keys = skiplist.getElementsByRevRange(-2, 2);
 ```
 
 Delete a key.
@@ -88,14 +95,14 @@ cd build && ./skiplist_test
 ### Setup
 Use a skiplist with initial depth = 16. All keys in the skiplist are random generated string with length = 10.
 ```
-2023-01-29T14:47:42+08:00
+2023-02-03T21:36:57+08:00
 Running ./skiplist_benchmark
-Run on (10 X 24.1214 MHz CPU s)
+Run on (10 X 24.1212 MHz CPU s)
 CPU Caches:
   L1 Data 64 KiB
   L1 Instruction 128 KiB
   L2 Unified 4096 KiB (x10)
-Load Average: 1.35, 1.86, 1.87
+Load Average: 1.90, 1.85, 1.82
 ```
 
 ### Running Benchmark
@@ -105,16 +112,17 @@ cd build && ./skiplist_benchmark
 
 ### Performance
 ```
--------------------------------------------------------------
-Benchmark                   Time             CPU   Iterations
--------------------------------------------------------------
-Insert                   5868 ns         5842 ns       122100
-Search                   4099 ns         4099 ns       154396
-Update                   6621 ns         6621 ns        91885
-Delete                   4718 ns         4718 ns       137806
-GetElementByRank          579 ns          579 ns      1149350
-GetRankOfElement         3999 ns         3999 ns       173237
-GetElementsByRange    3521490 ns      3521495 ns          184
+----------------------------------------------------------------
+Benchmark                      Time             CPU   Iterations
+----------------------------------------------------------------
+Insert                      5497 ns         5497 ns       100000
+Search                      4601 ns         4601 ns       159738
+Update                      6843 ns         6843 ns        95910
+Delete                      5234 ns         5233 ns       137233
+GetElementByRank             525 ns          525 ns      1153441
+GetRankOfElement            3959 ns         3959 ns       174487
+GetElementsByRange       2365208 ns      2365212 ns          231
+GetElementsByRevRange    2367075 ns      2367060 ns          334
 ```
 
 ## Formatting Code

@@ -99,6 +99,12 @@ static void GetElementsByRange(benchmark::State& state) {
   }
 }
 
+static void GetElementsByRevRange(benchmark::State& state) {
+  for (auto _ : state) {
+    skiplist.getElementsByRevRange(rand() % keys.size(), rand() % (keys.size() + 1));
+  }
+}
+
 BENCHMARK(Insert);
 BENCHMARK(Search);
 BENCHMARK(Update);
@@ -106,6 +112,7 @@ BENCHMARK(Delete);
 BENCHMARK(GetElementByRank);
 BENCHMARK(GetRankOfElement);
 BENCHMARK(GetElementsByRange);
+BENCHMARK(GetElementsByRevRange);
 
 }  // namespace skiplist
 

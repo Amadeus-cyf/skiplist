@@ -126,6 +126,53 @@ TEST(SkiplistTest, getElementsByRange) {
   ASSERT_EQ(k7.size(), 2);
   ASSERT_EQ(k7[0], "key4");
   ASSERT_EQ(k7[1], "key5");
+
+  const std::vector<std::string>& k8 = skiplist.getElementsByRange(INT_MAX, 1);
+  ASSERT_EQ(k8.size(), 0);
+
+  const std::vector<std::string>& k9 = skiplist.getElementsByRange(INT_MIN, 1);
+  ASSERT_EQ(k9.size(), 0);
+}
+
+TEST(SkiplistTest, getElementsByRevRange) {
+  const std::vector<std::string>& k1 = skiplist.getElementsByRevRange(-1, 4);
+  ASSERT_EQ(k1.size(), 4);
+  ASSERT_EQ(k1[0], "key5");
+  ASSERT_EQ(k1[3], "key0");
+
+  const std::vector<std::string>& k2 = skiplist.getElementsByRevRange(-1, 3);
+  ASSERT_EQ(k2.size(), 3);
+  ASSERT_EQ(k2[0], "key5");
+  ASSERT_EQ(k2[2], "key2");
+
+  const std::vector<std::string>& k3 = skiplist.getElementsByRevRange(-1, INT_MAX);
+  ASSERT_EQ(k3.size(), 4);
+  ASSERT_EQ(k3[0], "key5");
+  ASSERT_EQ(k3[3], "key0");
+
+  const std::vector<std::string>& k4 = skiplist.getElementsByRevRange(-1, 1);
+  ASSERT_EQ(k4.size(), 1);
+  ASSERT_EQ(k4[0], "key5");
+
+  const std::vector<std::string>& k5 = skiplist.getElementsByRevRange(1, 2);
+  ASSERT_EQ(k5.size(), 2);
+  ASSERT_EQ(k5[0], "key2");
+  ASSERT_EQ(k5[1], "key0");
+
+  const std::vector<std::string>& k6 = skiplist.getElementsByRevRange(1, INT_MAX);
+  ASSERT_EQ(k6.size(), 2);
+  ASSERT_EQ(k6[0], "key2");
+  ASSERT_EQ(k6[1], "key0");
+
+  const std::vector<std::string>& k7 = skiplist.getElementsByRevRange(0, 1);
+  ASSERT_EQ(k7.size(), 1);
+  ASSERT_EQ(k7[0], "key0");
+
+  const std::vector<std::string>& k8 = skiplist.getElementsByRevRange(INT_MAX, 1);
+  ASSERT_EQ(k8.size(), 0);
+
+  const std::vector<std::string>& k9 = skiplist.getElementsByRevRange(INT_MIN, 1);
+  ASSERT_EQ(k9.size(), 0);
 }
 
 TEST(SkiplistTest, Iteration) {
