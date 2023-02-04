@@ -96,7 +96,7 @@ TEST(SkiplistTest, GetRankofElement) {
   ASSERT_EQ(r3, -1);
 }
 
-TEST(SkiplistTest, getElementsByRange) {
+TEST(SkiplistTest, GetElementsByRange) {
   const std::vector<std::string>& k1 = skiplist.getElementsByRange(0, 4);
   ASSERT_EQ(k1.size(), 4);
   ASSERT_EQ(k1[0], "key0");
@@ -134,15 +134,18 @@ TEST(SkiplistTest, getElementsByRange) {
   ASSERT_EQ(k9.size(), 0);
 }
 
-TEST(SkiplistTest, getElementsByRevRange) {
+TEST(SkiplistTest, GetElementsByRevRange) {
   const std::vector<std::string>& k1 = skiplist.getElementsByRevRange(-1, 4);
   ASSERT_EQ(k1.size(), 4);
   ASSERT_EQ(k1[0], "key5");
+  ASSERT_EQ(k1[1], "key4");
+  ASSERT_EQ(k1[2], "key2");
   ASSERT_EQ(k1[3], "key0");
 
   const std::vector<std::string>& k2 = skiplist.getElementsByRevRange(-1, 3);
   ASSERT_EQ(k2.size(), 3);
   ASSERT_EQ(k2[0], "key5");
+  ASSERT_EQ(k2[1], "key4");
   ASSERT_EQ(k2[2], "key2");
 
   const std::vector<std::string>& k3 = skiplist.getElementsByRevRange(-1, INT_MAX);
@@ -173,6 +176,19 @@ TEST(SkiplistTest, getElementsByRevRange) {
 
   const std::vector<std::string>& k9 = skiplist.getElementsByRevRange(INT_MIN, 1);
   ASSERT_EQ(k9.size(), 0);
+}
+
+TEST(SkiplistTest, ArrayAccess) {
+  ASSERT_EQ(skiplist[0], "key0");
+  ASSERT_EQ(skiplist[1], "key2");
+  ASSERT_EQ(skiplist[2], "key4");
+  ASSERT_EQ(skiplist[3], "key5");
+  ASSERT_EQ(skiplist[skiplist.size() - 1], "key5");
+
+  ASSERT_THROW(skiplist[skiplist.size()], std::out_of_range);
+  ASSERT_THROW(skiplist[-1], std::out_of_range);
+  ASSERT_THROW(skiplist[INT_MAX], std::out_of_range);
+  ASSERT_THROW(skiplist[INT_MIN], std::out_of_range);
 }
 
 TEST(SkiplistTest, Iteration) {

@@ -8,7 +8,7 @@ cmake .. && cmake --build .
 ```
 
 ## Usage
-Init with default comparator. The type must support operator `<`, `>` and `==`.
+Init with default comparator. The type must support operators `<`, `>` and `==`.
 ```C++
 #include "skiplist.h"
 
@@ -43,6 +43,10 @@ Get a key by rank
 const string& first_key = skiplist.getElementByRank(0);
 /* get last element */
 const string& last_key = skiplist.getElementByRank(-1);
+
+/* access via index, 0-index based */
+const string& first_key = skiplist[0];
+const string& last_key = skiplist[skiplist.size()-1];
 ```
 
 Get rank of a key
@@ -53,9 +57,9 @@ const size_t rank = skiplist.getRankofElement("key");
 
 Get keys by range
 ```C++
-/* get 4 keys starting at the key of index 0 */
+/* get 4 keys starting at index 0 */
 const std::vector<string>& keys = skiplist.getElementsByRange(0, 4);
-/* get 2 keys starting at the second last key */
+/* get 2 keys starting at index size-1 */
 const std::vector<string>& last_keys = skiplist.getElementsByRange(-2, 2);
 ```
 
@@ -93,7 +97,7 @@ cd build && ./skiplist_test
 
 ## Benchmarks
 ### Setup
-Use a skiplist with initial depth = 16. All keys in the skiplist are random generated string with length = 10.
+Use a skiplist with initial depth = 16. All keys in the skiplist are random generated strings with length = 10.
 ```
 2023-02-03T21:36:57+08:00
 Running ./skiplist_benchmark

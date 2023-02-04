@@ -46,6 +46,7 @@ class Skiplist {
   ssize_t getRankofElement(const Key& key);
   std::vector<Key> getElementsByRange(int rank, size_t len);
   std::vector<Key> getElementsByRevRange(int rank, size_t len);
+  const Key& operator[](size_t i);
   size_t size() { return _size; }
   void clear();
   void print() const;
@@ -412,9 +413,17 @@ bool Skiplist<Key, Comparator>::update(const Key& key, const Key& new_key) {
 
 template <typename Key, typename Comparator>
 const Key& Skiplist<Key, Comparator>::getElementByRank(int rank) {
-  const SkiplistNode* node = getElement(rank >= 0 ? rank : rank + _size);
+  if (rank < 0) {
+    rank += _size;
+  }
 
-  if (!node) throw std::out_of_range("index out of bound");
+  if (rank < 0) {
+    throw std::out_of_range("skiplist index out of bound");
+  }
+
+  const SkiplistNode* node = getElement(rank);
+
+  if (!node) throw std::out_of_range("skiplist index out of bound");
 
   return node->key;
 }
@@ -458,6 +467,15 @@ std::vector<Key> Skiplist<Key, Comparator>::getElementsByRevRange(int idx, size_
   if (idx < 0) return {};
 
   return getElementsRev(idx, len);
+}
+
+template <typename Key, typename Comparator>
+const Key& Skiplist<Key, Comparator>::operator[](size_t i) {
+  const SkiplistNode* node = getElement(i);
+
+  if (node == nullptr) throw std::out_of_range("skiplist index out of bound");
+
+  return node->key;
 }
 
 template <typename Key, typename Comparator>
@@ -511,16 +529,18 @@ void Skiplist<Key, Comparator>::deleteNode(const Key& key, SkiplistNode* update[
 template <typename Key, typename Comparator>
 const typename Skiplist<Key, Comparator>::SkiplistNode* Skiplist<Key, Comparator>::getElement(
     size_t idx) {
-  int rank = -1;
+  if (idx >= _size) return nullptr;
+
+  size_t rank = 0;
   const SkiplistNode* node = head;
 
   for (int i = level - 1; i >= 0; --i) {
-    while (node->getNext(i) && (rank + node->getSpan(i) < idx)) {
+    while (node->getNext(i) && (rank + node->getSpan(i) < idx + 1)) {
       rank += node->getSpan(i);
       node = node->getNext(i);
     }
 
-    if (node->getNext(i) && rank + node->getSpan(i) == idx) {
+    if (node->getNext(i) && rank + node->getSpan(i) == idx + 1) {
       return node->getNext(i);
     }
   }
@@ -540,6 +560,7 @@ std::vector<Key> Skiplist<Key, Comparator>::getElements(size_t rank, size_t len)
     keys.push_back(node->key);
     node = node->getNext(0);
   }
+
   return keys;
 }
 
