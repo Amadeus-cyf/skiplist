@@ -105,6 +105,25 @@ static void GetElementsByRevRange(benchmark::State& state) {
   }
 }
 
+static void GetElementsGt(benchmark::State& state) {
+  for (auto _ : state) {
+    skiplist.getElementsGt(randString(10));
+  }
+}
+
+static void GetElementsLt(benchmark::State& state) {
+  for (auto _ : state) {
+    skiplist.getElementsLt(randString(10));
+  }
+}
+
+static void GetElementsInRange(benchmark::State& state) {
+  for (auto _ : state) {
+    const std::string &s1 = randString(10), &s2 = randString(10);
+    skiplist.getElementsInRange(s1 < s2 ? s1 : s2, s1 < s2 ? s2 : s1);
+  }
+}
+
 BENCHMARK(Insert);
 BENCHMARK(Search);
 BENCHMARK(Update);
@@ -113,6 +132,9 @@ BENCHMARK(GetElementByRank);
 BENCHMARK(GetRankOfElement);
 BENCHMARK(GetElementsByRange);
 BENCHMARK(GetElementsByRevRange);
+BENCHMARK(GetElementsGt);
+BENCHMARK(GetElementsLt);
+BENCHMARK(GetElementsInRange);
 
 }  // namespace skiplist
 

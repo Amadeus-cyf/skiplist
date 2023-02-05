@@ -178,6 +178,130 @@ TEST(SkiplistTest, GetElementsByRevRange) {
   ASSERT_EQ(k9.size(), 0);
 }
 
+TEST(SkiplistTest, GetElementsGt) {
+  const std::vector<std::string>& k0 = skiplist.getElementsGt("key0");
+  ASSERT_EQ(k0.size(), 3);
+  ASSERT_EQ(k0[0], "key2");
+
+  const std::vector<std::string>& k1 = skiplist.getElementsGt("key3");
+  ASSERT_EQ(k1.size(), 2);
+  ASSERT_EQ(k1[0], "key4");
+
+  const std::vector<std::string>& k2 = skiplist.getElementsGt("key6");
+  ASSERT_EQ(k2.size(), 0);
+
+  const std::vector<std::string>& k3 = skiplist.getElementsGt("abc");
+  ASSERT_EQ(k3.size(), 4);
+  ASSERT_EQ(k3[0], "key0");
+}
+
+TEST(SkiplistTest, GetElementsGte) {
+  const std::vector<std::string>& k0 = skiplist.getElementsGte("key0");
+  ASSERT_EQ(k0.size(), 4);
+  ASSERT_EQ(k0[0], "key0");
+
+  const std::vector<std::string>& k1 = skiplist.getElementsGte("key3");
+  ASSERT_EQ(k1.size(), 2);
+  ASSERT_EQ(k1[0], "key4");
+
+  const std::vector<std::string>& k2 = skiplist.getElementsGte("key6");
+  ASSERT_EQ(k2.size(), 0);
+
+  const std::vector<std::string>& k3 = skiplist.getElementsGte("key5");
+  ASSERT_EQ(k3.size(), 1);
+  ASSERT_EQ(k3[0], "key5");
+}
+
+TEST(SkiplistTest, GetElementsLt) {
+  const std::vector<std::string>& k0 = skiplist.getElementsLt("key5");
+  ASSERT_EQ(k0.size(), 3);
+  ASSERT_EQ(k0[0], "key0");
+  ASSERT_EQ(k0[2], "key4");
+
+  const std::vector<std::string>& k1 = skiplist.getElementsLt("key3");
+  ASSERT_EQ(k1.size(), 2);
+  ASSERT_EQ(k1[0], "key0");
+  ASSERT_EQ(k1[1], "key2");
+
+  const std::vector<std::string>& k2 = skiplist.getElementsLt("key2");
+  ASSERT_EQ(k2.size(), 1);
+  ASSERT_EQ(k2[0], "key0");
+
+  const std::vector<std::string>& k3 = skiplist.getElementsLt("key0");
+  ASSERT_EQ(k3.size(), 0);
+
+  const std::vector<std::string>& k4 = skiplist.getElementsLt("key6");
+  ASSERT_EQ(k4.size(), 4);
+  ASSERT_EQ(k4[0], "key0");
+  ASSERT_EQ(k4[3], "key5");
+}
+
+TEST(SkiplistTest, GetElementsLte) {
+  const std::vector<std::string>& k0 = skiplist.getElementsLte("key5");
+  ASSERT_EQ(k0.size(), 4);
+  ASSERT_EQ(k0[0], "key0");
+  ASSERT_EQ(k0[3], "key5");
+
+  const std::vector<std::string>& k1 = skiplist.getElementsLte("key3");
+  ASSERT_EQ(k1.size(), 2);
+  ASSERT_EQ(k1[0], "key0");
+  ASSERT_EQ(k1[1], "key2");
+
+  const std::vector<std::string>& k2 = skiplist.getElementsLte("key2");
+  ASSERT_EQ(k2.size(), 2);
+  ASSERT_EQ(k2[0], "key0");
+  ASSERT_EQ(k2[1], "key2");
+
+  const std::vector<std::string>& k3 = skiplist.getElementsLte("key0");
+  ASSERT_EQ(k3.size(), 1);
+  ASSERT_EQ(k3[0], "key0");
+
+  const std::vector<std::string>& k4 = skiplist.getElementsLte("abc");
+  ASSERT_EQ(k4.size(), 0);
+}
+
+TEST(SkiplistTest, GetElementsInRange) {
+  const std::vector<std::string>& k0 = skiplist.getElementsInRange("key0", "key6");
+  ASSERT_EQ(k0.size(), 4);
+  ASSERT_EQ(k0[0], "key0");
+  ASSERT_EQ(k0[3], "key5");
+
+  const std::vector<std::string>& k1 = skiplist.getElementsInRange("key0", "key5");
+  ASSERT_EQ(k1.size(), 3);
+  ASSERT_EQ(k1[0], "key0");
+  ASSERT_EQ(k1[2], "key4");
+
+  const std::vector<std::string>& k2 = skiplist.getElementsInRange("key0", "key3");
+  ASSERT_EQ(k2.size(), 2);
+  ASSERT_EQ(k2[0], "key0");
+  ASSERT_EQ(k2[1], "key2");
+
+  const std::vector<std::string>& k3 = skiplist.getElementsInRange("key0", "key2");
+  ASSERT_EQ(k3.size(), 1);
+  ASSERT_EQ(k3[0], "key0");
+
+  const std::vector<std::string>& k4 = skiplist.getElementsInRange("key0", "key1");
+  ASSERT_EQ(k4.size(), 1);
+  ASSERT_EQ(k4[0], "key0");
+
+  const std::vector<std::string>& k5 = skiplist.getElementsInRange("key0", "key0");
+  ASSERT_EQ(k5.size(), 0);
+
+  const std::vector<std::string>& k6 = skiplist.getElementsInRange("abc", "xyz");
+  ASSERT_EQ(k6.size(), 4);
+  ASSERT_EQ(k6[0], "key0");
+  ASSERT_EQ(k6[3], "key5");
+
+  const std::vector<std::string>& k7 = skiplist.getElementsInRange("abc", "aed");
+  ASSERT_EQ(k7.size(), 0);
+
+  const std::vector<std::string>& k8 = skiplist.getElementsInRange("wxy", "xyz");
+  ASSERT_EQ(k8.size(), 0);
+
+  const std::vector<std::string>& k9 = skiplist.getElementsInRange("key5", "key0");
+  ASSERT_EQ(k9.size(), 0);
+}
+
 TEST(SkiplistTest, ArrayAccess) {
   ASSERT_EQ(skiplist[0], "key0");
   ASSERT_EQ(skiplist[1], "key2");

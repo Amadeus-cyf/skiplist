@@ -7,6 +7,14 @@ mkdir build && cd build
 cmake .. && cmake --build .
 ```
 
+## Sample
+```
+h3---4---end
+h2---1---key0---2---key4---1---end
+h1---1---key0---1---key2---1---key4---1---end
+h0---1---key0---1---key2---1---key4---1---key5---0---end
+```
+
 ## Usage
 Init with default comparator. The type must support operators `<`, `>` and `==`.
 ```C++
@@ -71,6 +79,36 @@ const std::vector<string>& keys = skiplist.getElementsByRevRange(0, 4);
 const std::vector<string>& last_keys = skiplist.getElementsByRevRange(-2, 2);
 ```
 
+Get keys greater than a value
+```C++
+/* return all keys greater than "key_to_compare" */
+const std::vector<string>& keys = skiplist.getElementsGt("key_to_compare");
+```
+
+Get keys greater than or equal to a value
+```C++
+/* return all keys greater than or equal to "key_to_compare" */
+const std::vector<string>& keys = skiplist.getElementsGte("key_to_compare");
+```
+
+Get keys less than a value
+```C++
+/* return all keys less than "key_to_compare" */
+const std::vector<string>& keys = skiplist.getElementsLt("key_to_compare");
+```
+
+Get keys less than or equal to a value
+```C++
+/* return all keys less than or equal to "key_to_compare" */
+const std::vector<string>& keys = skiplist.getElementsLte("key_to_compare");
+```
+
+Get keys within a range
+```C++
+/* return all keys within the range [key_start, key_end) */
+const std::vector<string>& keys = skiplist.getElementsInRange("key_start", "key_end");
+```
+
 Delete a key.
 ```C++
 /* return true if success */
@@ -90,6 +128,11 @@ for (auto it = skiplist.begin(); it != skiplist.end(); ++it) {
 }
 ```
 
+Print the skiplist.
+```C++
+skiplist.print();
+```
+
 ## Running Unit Tests
 ```sh
 cd build && ./skiplist_test
@@ -99,14 +142,14 @@ cd build && ./skiplist_test
 ### Setup
 Use a skiplist with initial depth = 16. All keys in the skiplist are random generated strings with length = 10.
 ```
-2023-02-03T21:36:57+08:00
+2023-02-05T15:38:21+08:00
 Running ./skiplist_benchmark
-Run on (10 X 24.1212 MHz CPU s)
+Run on (10 X 24.0411 MHz CPU s)
 CPU Caches:
   L1 Data 64 KiB
   L1 Instruction 128 KiB
   L2 Unified 4096 KiB (x10)
-Load Average: 1.90, 1.85, 1.82
+Load Average: 2.43, 2.12, 1.88
 ```
 
 ### Running Benchmark
@@ -119,17 +162,15 @@ cd build && ./skiplist_benchmark
 ----------------------------------------------------------------
 Benchmark                      Time             CPU   Iterations
 ----------------------------------------------------------------
-Insert                      5497 ns         5497 ns       100000
-Search                      4601 ns         4601 ns       159738
-Update                      6843 ns         6843 ns        95910
-Delete                      5234 ns         5233 ns       137233
-GetElementByRank             525 ns          525 ns      1153441
-GetRankOfElement            3959 ns         3959 ns       174487
-GetElementsByRange       2365208 ns      2365212 ns          231
-GetElementsByRevRange    2367075 ns      2367060 ns          334
-```
-
-## Formatting Code
-```sh
-clang-format -i --style=file src/skiplist.h && clang-format -i --style=file src/skiplist_test.cc && clang-format -i --style=file benchmarks/skiplist_benchmark.cc
+Insert                      5653 ns         5652 ns       115831
+Search                      4776 ns         4776 ns       147758
+Update                      7002 ns         7002 ns        93333
+Delete                      4718 ns         4718 ns       134987
+GetElementByRank             583 ns          583 ns      1087176
+GetRankOfElement            4025 ns         4025 ns       172011
+GetElementsByRange       3439821 ns      3439819 ns          221
+GetElementsByRevRange    3278682 ns      3278642 ns          316
+GetElementsGt            6601971 ns      6601740 ns          127
+GetElementsLt            6820850 ns      6820857 ns           77
+GetElementsInRange       5668682 ns      5668310 ns          100
 ```
