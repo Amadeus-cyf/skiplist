@@ -9,7 +9,7 @@ add_library(skiplist SHARED)
 set_target_properties(skiplist PROPERTIES LINKER_LANGUAGE CXX)
 target_sources(skiplist
   PRIVATE
-    "src/skiplist.h"
+    "skiplist.h"
 )
 
 add_subdirectory("third_party/googletest")
@@ -17,7 +17,7 @@ add_subdirectory("third_party/googletest")
 add_executable(skiplist_test "")
 target_sources(skiplist_test
   PRIVATE
-    "src/skiplist_test.cc"
+    "skiplist_test.cc"
 )
 
 target_link_libraries(

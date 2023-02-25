@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include "src/skiplist.h"
+#include "skiplist.h"
 
 namespace skiplist {
 
