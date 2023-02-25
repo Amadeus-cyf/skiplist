@@ -20,7 +20,7 @@ Init with default comparator. The type must support operators `<`, `>` and `==`.
 ```C++
 #include "skiplist.h"
 
-Skiplist<string> skiplist(4); /* initial depths */
+skiplist::Skiplist<std::string> skiplist(4); /* initial depths */
 ```
 
 Init with custom comparator.
@@ -28,8 +28,8 @@ Init with custom comparator.
 #include "skiplist.h"
 
 const auto compare =
-    [](const string& k1, const string& k2) { return k1 < k2 ? -1 : (k1 == k2 ? 0 : 1); };
-Skiplist<string, decltype(compare)> skiplist(4, compare);
+    [](const std::string& k1, const std::string& k2) { return k1 < k2 ? -1 : (k1 == k2 ? 0 : 1); };
+skiplist::Skiplist<std::string, decltype(compare)> skiplist(4, compare);
 ```
 
 Insert a key.
@@ -48,13 +48,13 @@ if(skiplist.contains("key1")) {
 Get a key by rank
 ```C++
 /* get first element */
-const string& first_key = skiplist.getElementByRank(0);
+const std::string& first_key = skiplist.getElementByRank(0);
 /* get last element */
-const string& last_key = skiplist.getElementByRank(-1);
+const std::string& last_key = skiplist.getElementByRank(-1);
 
 /* access via index, 0-index based */
-const string& first_key = skiplist[0];
-const string& last_key = skiplist[skiplist.size()-1];
+const std::string& first_key = skiplist[0];
+const std::string& last_key = skiplist[skiplist.size()-1];
 ```
 
 Get rank of a key
@@ -66,47 +66,47 @@ const size_t rank = skiplist.getRankofElement("key");
 Get keys by range
 ```C++
 /* get 4 keys starting at index 0 */
-const std::vector<string>& keys = skiplist.getElementsByRange(0, 4);
+const std::vector<std::string>& keys = skiplist.getElementsByRange(0, 4);
 /* get 2 keys starting at index size-1 */
-const std::vector<string>& last_keys = skiplist.getElementsByRange(-2, 2);
+const std::vector<std::string>& last_keys = skiplist.getElementsByRange(-2, 2);
 ```
 
 Get keys by reverse range
 ```C++
 /* get 4 keys reversely starting at the key of index 0 */
-const std::vector<string>& keys = skiplist.getElementsByRevRange(0, 4);
+const std::vector<std::string>& keys = skiplist.getElementsByRevRange(0, 4);
 /* get 2 keys reversely starting at the second last key */
-const std::vector<string>& last_keys = skiplist.getElementsByRevRange(-2, 2);
+const std::vector<std::string>& last_keys = skiplist.getElementsByRevRange(-2, 2);
 ```
 
 Get keys greater than a value
 ```C++
 /* return all keys greater than "key_to_compare" */
-const std::vector<string>& keys = skiplist.getElementsGt("key_to_compare");
+const std::vector<std::string>& keys = skiplist.getElementsGt("key_to_compare");
 ```
 
 Get keys greater than or equal to a value
 ```C++
 /* return all keys greater than or equal to "key_to_compare" */
-const std::vector<string>& keys = skiplist.getElementsGte("key_to_compare");
+const std::vector<std::string>& keys = skiplist.getElementsGte("key_to_compare");
 ```
 
 Get keys less than a value
 ```C++
 /* return all keys less than "key_to_compare" */
-const std::vector<string>& keys = skiplist.getElementsLt("key_to_compare");
+const std::vector<std::string>& keys = skiplist.getElementsLt("key_to_compare");
 ```
 
 Get keys less than or equal to a value
 ```C++
 /* return all keys less than or equal to "key_to_compare" */
-const std::vector<string>& keys = skiplist.getElementsLte("key_to_compare");
+const std::vector<std::string>& keys = skiplist.getElementsLte("key_to_compare");
 ```
 
 Get keys within a range
 ```C++
 /* return all keys within the range [key_start, key_end) */
-const std::vector<string>& keys = skiplist.getElementsInRange("key_start", "key_end");
+const std::vector<std::string>& keys = skiplist.getElementsInRange("key_start", "key_end");
 ```
 
 Delete a key.
