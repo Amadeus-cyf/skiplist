@@ -345,4 +345,45 @@ void scanSkiplist(const Skiplist<std::string>& skiplist) {
   skiplist.print();
 }
 
+struct Comparator {
+  int operator()(const std::string& k1, const std::string& k2) const {
+    return k1 < k2 ? 1 : (k1 == k2 ? 0 : -1);
+  }
+};
+
+Comparator cmp;
+Skiplist<std::string, Comparator> skiplist2(4, cmp);
+
+TEST(SkiplistTest, CustomInsertion) {
+  ASSERT_TRUE(skiplist2.insert("key1"));
+  ASSERT_TRUE(skiplist2.insert("key2"));
+  ASSERT_TRUE(skiplist2.insert("key0"));
+  ASSERT_FALSE(skiplist2.insert("key1"));
+  ASSERT_EQ(skiplist2.size(), 3);
+
+  ASSERT_TRUE(skiplist2.contains("key1"));
+  ASSERT_TRUE(skiplist2.contains("key2"));
+  ASSERT_TRUE(skiplist2.contains("key0"));
+  ASSERT_TRUE(!skiplist2.contains("key_not_exist"));
+}
+
+TEST(SkiplistTest, CustomArrayAccess) {
+  ASSERT_EQ(skiplist2[0], "key2");
+  ASSERT_EQ(skiplist2[1], "key1");
+  ASSERT_EQ(skiplist2[2], "key0");
+  ASSERT_EQ(skiplist2[skiplist2.size() - 1], "key0");
+
+  ASSERT_THROW(skiplist2[skiplist.size()], std::out_of_range);
+  ASSERT_THROW(skiplist2[-1], std::out_of_range);
+  ASSERT_THROW(skiplist2[INT_MAX], std::out_of_range);
+  ASSERT_THROW(skiplist2[INT_MIN], std::out_of_range);
+}
+
+TEST(SkiplistTest, CustomGetElementsInRange) {
+  const std::vector<std::string>& ks = skiplist2.getElementsInRange("key2", "key0");
+  ASSERT_EQ(ks.size(), 2);
+  ASSERT_EQ(ks[0], "key2");
+  ASSERT_EQ(ks[1], "key1");
+}
+
 }  // namespace skiplist

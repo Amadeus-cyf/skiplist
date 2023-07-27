@@ -34,8 +34,8 @@ class Skiplist {
     const Skiplist* skiplist;
   };
   Skiplist();
-  explicit Skiplist(size_t level);
-  explicit Skiplist(size_t level, Comparator compare);
+  explicit Skiplist(const size_t level);
+  explicit Skiplist(const size_t level, const Comparator& compare);
   Iterator begin() const;
   Iterator end() const;
   bool insert(const Key& key);
@@ -230,14 +230,14 @@ Skiplist<Key, Comparator>::Skiplist()
       _size(0){};
 
 template <typename Key, typename Comparator>
-Skiplist<Key, Comparator>::Skiplist(size_t level)
+Skiplist<Key, Comparator>::Skiplist(const size_t level)
     : level(level),
       head(SkiplistNode::createSkiplistNode(level)),
       compare(default_compare<Key>),
       _size(0){};
 
 template <typename Key, typename Comparator>
-Skiplist<Key, Comparator>::Skiplist(size_t level, Comparator compare)
+Skiplist<Key, Comparator>::Skiplist(const size_t level, const Comparator& compare)
     : level(level), head(SkiplistNode::createSkiplistNode(level)), compare(compare), _size(0){};
 
 template <typename Key, typename Comparator>
