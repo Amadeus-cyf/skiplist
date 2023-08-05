@@ -295,6 +295,7 @@ bool Skiplist<Key, Comparator>::insert(const Key& key) {
    */
   for (int i = level; i < insert_level; ++i) {
     head->initLevel(i);
+    head->setSpan(i, _size);
   }
 
   if (insert_level > level) level = insert_level;
