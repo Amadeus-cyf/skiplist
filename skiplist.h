@@ -66,27 +66,6 @@ class Skiplist {
   size_t _size;
 };
 
-/* Iterator*/
-template <typename Key, typename Comparator>
-class Skiplist<Key, Comparator>::Iterator {
- public:
-  explicit Iterator(const Skiplist* skiplist);
-  explicit Iterator(const Skiplist* skiplist, const SkiplistNode* node);
-  Iterator(const Iterator& it);
-  void seekToFirst();
-  void seekToLast();
-  Iterator& operator=(const Iterator& it);
-  void operator--();
-  void operator++();
-  bool operator==(const Iterator& it);
-  bool operator!=(const Iterator& it);
-  const Key& operator*();
-
- private:
-  const SkiplistNode* node;
-  const Skiplist* skiplist;
-};
-
 /* SkiplistLevel */
 template <typename Key, typename Comparator>
 struct Skiplist<Key, Comparator>::SkiplistLevel {
@@ -169,6 +148,26 @@ Skiplist<Key, Comparator>::SkiplistNode::~SkiplistNode() {
 }
 
 /* Iterator */
+template <typename Key, typename Comparator>
+class Skiplist<Key, Comparator>::Iterator {
+ public:
+  explicit Iterator(const Skiplist* skiplist);
+  explicit Iterator(const Skiplist* skiplist, const SkiplistNode* node);
+  Iterator(const Iterator& it);
+  void seekToFirst();
+  void seekToLast();
+  Iterator& operator=(const Iterator& it);
+  void operator--();
+  void operator++();
+  bool operator==(const Iterator& it);
+  bool operator!=(const Iterator& it);
+  const Key& operator*();
+
+ private:
+  const SkiplistNode* node;
+  const Skiplist* skiplist;
+};
+
 template <typename Key, typename Comparator>
 Skiplist<Key, Comparator>::Iterator::Iterator(const Skiplist* skiplist)
     : skiplist(skiplist), node(nullptr) {}
