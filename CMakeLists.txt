@@ -14,19 +14,19 @@ target_sources(skiplist
 
 add_subdirectory("third_party/googletest")
 
-add_executable(skiplist_test "")
-target_sources(skiplist_test
+add_executable(skiplist_tests "")
+target_sources(skiplist_tests
   PRIVATE
     "skiplist_test.cc"
 )
 
 target_link_libraries(
-  skiplist_test
+  skiplist_tests
   GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(skiplist_test)
+gtest_discover_tests(skiplist_tests)
 
 add_subdirectory("third_party/benchmark")
 
