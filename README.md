@@ -65,18 +65,18 @@ const size_t rank = skiplist.getRankofElement("key");
 
 Get keys by range
 ```C++
-/* get 4 keys starting at index 0 */
+/* get keys between [0, 4] */
 const std::vector<std::string>& keys = skiplist.getElementsByRange(0, 4);
-/* get 2 keys starting at index size-1 */
-const std::vector<std::string>& last_keys = skiplist.getElementsByRange(-2, 2);
+/* get the second last and the last key */
+const std::vector<std::string>& last_keys = skiplist.getElementsByRange(-2, -1);
 ```
 
 Get keys by reverse range
 ```C++
-/* get 4 keys reversely starting at the key of index 0 */
+/* get keys reversely between [0, 4]  */
 const std::vector<std::string>& keys = skiplist.getElementsByRevRange(0, 4);
-/* get 2 keys reversely starting at the second last key */
-const std::vector<std::string>& last_keys = skiplist.getElementsByRevRange(-2, 2);
+/* get reversely the second last and the last key */
+const std::vector<std::string>& last_keys = skiplist.getElementsByRevRange(-2, -1);
 ```
 
 Get keys greater than a value
@@ -135,7 +135,7 @@ skiplist.print();
 
 ## Running Unit Tests
 ```sh
-cd build && ./skiplist_test
+cd build && ./skiplist_tests
 ```
 
 ## Benchmarks
@@ -155,22 +155,4 @@ Load Average: 2.43, 2.12, 1.88
 ### Running Benchmark
 ```sh
 cd build && ./skiplist_benchmark
-```
-
-### Performance
-```
-----------------------------------------------------------------
-Benchmark                      Time             CPU   Iterations
-----------------------------------------------------------------
-Insert                      5653 ns         5652 ns       115831
-Search                      4776 ns         4776 ns       147758
-Update                      7002 ns         7002 ns        93333
-Delete                      4718 ns         4718 ns       134987
-GetElementByRank             583 ns          583 ns      1087176
-GetRankOfElement            4025 ns         4025 ns       172011
-GetElementsByRange       3439821 ns      3439819 ns          221
-GetElementsByRevRange    3278682 ns      3278642 ns          316
-GetElementsGt            6601971 ns      6601740 ns          127
-GetElementsLt            6820850 ns      6820857 ns           77
-GetElementsInRange       5668682 ns      5668310 ns          100
 ```
